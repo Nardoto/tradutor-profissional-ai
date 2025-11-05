@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Tradutor Profissional - Powered by Google Gemini AI">
-    <title>Tradutor Profissional - v2.1.0</title>
+    <title>Tradutor Profissional - v2.2.0</title>
     <link rel="stylesheet" href="styles.css?v=2.8.6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -175,6 +175,40 @@
             </button>
         </div>
 
+        <!-- Banner Informativo -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: var(--radius-sm); padding: 1.5rem; margin-bottom: 2rem; color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+            <h3 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                Como usar o Tradutor Profissional AI
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: var(--radius-sm); backdrop-filter: blur(10px);">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: white; color: #667eea; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold;">1</span>
+                        Escreva ou cole seu texto
+                    </div>
+                    <p style="margin: 0; opacity: 0.95; line-height: 1.5;">Digite ou cole o texto que deseja traduzir no campo à esquerda. Pode ser um roteiro, artigo, legenda ou qualquer texto.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: var(--radius-sm); backdrop-filter: blur(10px);">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: white; color: #667eea; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold;">2</span>
+                        Selecione o idioma e traduza
+                    </div>
+                    <p style="margin: 0; opacity: 0.95; line-height: 1.5;">Escolha o idioma de destino e clique em "Traduzir". A IA Google Gemini fará uma tradução profissional em segundos.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: var(--radius-sm); backdrop-filter: blur(10px);">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: white; color: #667eea; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold;">3</span>
+                        Exporte como TXT ou SRT
+                    </div>
+                    <p style="margin: 0; opacity: 0.95; line-height: 1.5;">Após traduzir, exporte como arquivo TXT (texto simples) ou SRT (legenda com timestamps) para usar em vídeos!</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Controls -->
         <div class="controls">
             <select id="sourceLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 250px;">
@@ -210,12 +244,12 @@
                 Traduzir
             </button>
 
-            <button id="exportButton" class="btn-secondary" style="display: none;">
+            <button id="exportButton" class="btn-secondary" style="display: none;" title="Exportar tradução como arquivo de texto (.txt)">
                 💾 Exportar TXT
             </button>
 
-            <button id="exportSrtButton" class="btn-secondary" style="display: none;">
-                🎬 Exportar SRT
+            <button id="exportSrtButton" class="btn-secondary" style="display: none;" title="Exportar como legenda com timestamps para vídeos (.srt)">
+                🎬 Exportar SRT (Legenda)
             </button>
 
             <button id="clearButton" class="btn-secondary">
@@ -253,10 +287,24 @@
                 </div>
             </div>
 
-            <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
-                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
-                    <strong>💡 Dica:</strong> A legenda será automaticamente dividida em blocos de acordo com os parâmetros acima, respeitando quebras de frase.
-                </p>
+            <div style="margin-top: 1.5rem; display: grid; gap: 0.75rem;">
+                <div style="padding: 0.75rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
+                        <strong>💡 Como funciona:</strong> A tradução será automaticamente dividida em blocos de legenda com timestamps calculados pela velocidade de leitura. Perfeito para criar legendas em vídeos do YouTube, Vimeo ou qualquer player que suporte SRT!
+                    </p>
+                </div>
+
+                <div style="padding: 0.75rem; background: #d4edda; border-radius: var(--radius-sm); border-left: 3px solid #28a745;">
+                    <p style="margin: 0; font-size: 0.85rem; color: #155724;">
+                        <strong>🎯 Fluxo recomendado:</strong> Escreva seu roteiro em português → Traduza para o idioma desejado → Exporte em SRT → Importe a legenda no seu editor de vídeo ou YouTube!
+                    </p>
+                </div>
+
+                <div style="padding: 0.75rem; background: #fff3cd; border-radius: var(--radius-sm); border-left: 3px solid #ffc107;">
+                    <p style="margin: 0; font-size: 0.85rem; color: #856404;">
+                        <strong>⚙️ Personalização:</strong> Ajuste os parâmetros acima para controlar o tamanho das legendas e velocidade de exibição. Valores maiores = legendas mais longas, valores menores = legendas mais curtas e rápidas.
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -418,6 +466,6 @@
     <div id="toast" class="toast"></div>
 
     <!-- Scripts -->
-    <script src="translator.js?v=2.1.2"></script>
+    <script src="translator.js?v=2.2.0"></script>
 </body>
 </html>

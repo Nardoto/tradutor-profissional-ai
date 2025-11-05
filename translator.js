@@ -1,13 +1,13 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 2.1.2 - Bug fixes
+// Version: 2.2.0 - Banner informativo e melhorias UX
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.1.2 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v2.2.0 - by Nardoto');
 
         this.geminiApiKey = null;
         this.isTranslating = false;
