@@ -1,15 +1,20 @@
 // ========================================
-// TRADUTOR DE TEXTOS RELIGIOSOS
-// Standalone Translation Tool
-// Version: 1.0.0
+// TRADUTOR PROFISSIONAL AI
+// Professional Translation Tool
+// Version: 2.0.0
+// Desenvolvido por: Tharcisio Nardoto
 // ========================================
 
-class BiblicalTranslator {
+class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor de Textos Religiosos v1.0.0');
+        console.log('🌐 Tradutor Profissional AI v2.0.0 - by Tharcisio Nardoto');
 
         this.geminiApiKey = null;
         this.isTranslating = false;
+        this.translatedText = '';
+        this.originalText = '';
+        this.sourceLang = '';
+        this.targetLang = '';
 
         this.init();
     }
@@ -25,6 +30,10 @@ class BiblicalTranslator {
 
         document.getElementById('clearButton').addEventListener('click', () => {
             this.clearAll();
+        });
+
+        document.getElementById('exportButton').addEventListener('click', () => {
+            this.exportToTxt();
         });
 
         document.getElementById('settingsButton').addEventListener('click', () => {
@@ -56,6 +65,15 @@ class BiblicalTranslator {
             this.updateCounter('translated', e.target.value);
         });
 
+        // Atualizar label quando idioma de origem mudar
+        document.getElementById('sourceLangSelector').addEventListener('change', (e) => {
+            this.updateOriginalLabel(e.target.value);
+        });
+
+        document.getElementById('targetLangSelector').addEventListener('change', (e) => {
+            this.updateTranslatedLabel(e.target.value);
+        });
+
         // Fechar modal ao clicar fora
         document.getElementById('settingsModal').addEventListener('click', (e) => {
             if (e.target.id === 'settingsModal') {
@@ -72,17 +90,106 @@ class BiblicalTranslator {
         }
     }
 
+    updateOriginalLabel(langValue) {
+        const langNames = {
+            'auto': 'Texto Original',
+            'portuguese': 'Texto Original (Português)',
+            'english': 'Texto Original (English)',
+            'spanish': 'Texto Original (Español)',
+            'french': 'Texto Original (Français)',
+            'italian': 'Texto Original (Italiano)',
+            'german': 'Texto Original (Deutsch)'
+        };
+        document.getElementById('originalLanguageLabel').textContent = langNames[langValue] || 'Texto Original';
+    }
+
+    updateTranslatedLabel(langValue) {
+        const langNames = {
+            'portuguese': 'Tradução (Português)',
+            'english': 'Tradução (English)',
+            'spanish': 'Tradução (Español)',
+            'french': 'Tradução (Français)',
+            'italian': 'Tradução (Italiano)',
+            'german': 'Tradução (Deutsch)'
+        };
+        document.getElementById('translatedLanguageLabel').textContent = langNames[langValue] || 'Tradução';
+    }
+
     updateCounter(type, text) {
         const charCount = text.length;
         const counterId = type === 'original' ? 'originalCounter' : 'translatedCounter';
         document.getElementById(counterId).textContent = `${charCount.toLocaleString()} caracteres`;
     }
 
+    showProgressModal() {
+        const modal = document.createElement('div');
+        modal.id = 'progressModal';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 600px;">
+                <div style="text-align: center; padding: 2rem;">
+                    <h2 style="margin: 0 0 2rem 0; color: var(--accent-primary);">
+                        🌐 Traduzindo...
+                    </h2>
+
+                    <div style="background: var(--bg-hover); border-radius: var(--radius-sm); padding: 2rem; margin-bottom: 2rem;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; border: 4px solid var(--accent-primary); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+
+                        <div style="height: 40px; background: var(--bg-secondary); border-radius: 20px; overflow: hidden; position: relative; margin-bottom: 1rem;">
+                            <div id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem;"></div>
+                        </div>
+
+                        <p id="progressText" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 500; margin: 0;"></p>
+                    </div>
+
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+                        Processando com Google Gemini AI...
+                    </p>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Adicionar animação de spin
+        if (!document.getElementById('spinAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'spinAnimation';
+            style.textContent = `
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    updateProgress(text, percentage) {
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        if (progressBar && progressText) {
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage}%`;
+            progressText.textContent = text;
+        }
+    }
+
+    closeProgressModal() {
+        const modal = document.getElementById('progressModal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
     async translate() {
         if (this.isTranslating) return;
 
         const originalText = document.getElementById('originalText').value.trim();
-        const languageSelector = document.getElementById('languageSelector');
+        const sourceLangSelector = document.getElementById('sourceLangSelector');
+        const targetLangSelector = document.getElementById('targetLangSelector');
 
         // Validações
         if (!originalText) {
@@ -90,8 +197,13 @@ class BiblicalTranslator {
             return;
         }
 
-        if (!languageSelector.value) {
-            this.showToast('⚠️ Selecione um idioma de destino', 'warning');
+        if (!sourceLangSelector.value) {
+            this.showToast('⚠️ Selecione o idioma de origem', 'warning');
+            return;
+        }
+
+        if (!targetLangSelector.value) {
+            this.showToast('⚠️ Selecione o idioma de destino', 'warning');
             return;
         }
 
@@ -103,71 +215,79 @@ class BiblicalTranslator {
 
         const languageMap = {
             'english': 'Inglês',
-            'portuguese': 'Português (Brasil)',
+            'portuguese': 'Português',
             'spanish': 'Espanhol',
             'french': 'Francês',
             'italian': 'Italiano',
-            'german': 'Alemão'
+            'german': 'Alemão',
+            'auto': 'detectado automaticamente'
         };
 
-        const targetLanguage = languageMap[languageSelector.value];
+        this.sourceLang = languageMap[sourceLangSelector.value];
+        this.targetLang = languageMap[targetLangSelector.value];
+        this.originalText = originalText;
 
         // Atualizar UI
         this.isTranslating = true;
         const translateButton = document.getElementById('translateButton');
         const originalButtonText = translateButton.innerHTML;
-        translateButton.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem; animation: spin 1s linear infinite;">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 6v6l4 2"/>
-            </svg>
-            Traduzindo...
-        `;
         translateButton.disabled = true;
 
-        document.getElementById('translatedLanguageLabel').textContent = `Tradução (${targetLanguage})`;
+        // Mostrar modal de progresso
+        this.showProgressModal();
+        this.updateProgress('Iniciando tradução...', 0);
 
-        const prompt = `
-Você é um tradutor especializado em roteiros de documentários bíblicos e textos religiosos.
+        await this.sleep(300);
+        this.updateProgress('Preparando dados...', 15);
 
-TAREFA: Traduza o texto abaixo de Português para ${targetLanguage}, mantendo TOTAL FIDELIDADE ao conteúdo original.
+        const sourceLanguageText = sourceLangSelector.value === 'auto'
+            ? 'detecte automaticamente o idioma de origem e'
+            : `do ${this.sourceLang} para`;
+
+        const prompt = `Você é um tradutor profissional especializado.
+
+TAREFA: ${sourceLanguageText} traduza o texto abaixo para ${this.targetLang}, mantendo TOTAL FIDELIDADE ao conteúdo original.
 
 INSTRUÇÕES CRÍTICAS:
-1. PRESERVAÇÃO TEOLÓGICA:
-   - Mantenha EXATAMENTE o significado teológico e doutrinário
-   - Preserve todos os nomes bíblicos (Jesus, Jerusalém, Abraão, etc.)
-   - Mantenha termos técnicos religiosos com precisão
+1. PRESERVAÇÃO DE CONTEÚDO:
+   - Mantenha EXATAMENTE o significado original
+   - Preserve todos os nomes próprios
+   - Mantenha termos técnicos com precisão
+   - Preserve números, datas e referências
 
-2. ESTILO NARRATIVO:
-   - Mantenha o tom narrativo de documentário
-   - Preserve o ritmo e a cadência do texto original
-   - Mantenha a força dramática e emocional das passagens
+2. ESTILO E TOM:
+   - Mantenha o tom e estilo do texto original
+   - Preserve o ritmo e a cadência
+   - Mantenha a força emocional das passagens
 
-3. FIDELIDADE ESTRUTURAL:
+3. ESTRUTURA:
    - Mantenha TODOS os parágrafos e quebras de linha
    - Preserve marcadores de tempo (ex: "0:00-2:30")
    - Mantenha títulos e subtítulos sem alteração de formato
 
-4. QUALIDADE LINGUÍSTICA:
-   - Use linguagem culta e fluente em ${targetLanguage}
+4. QUALIDADE:
+   - Use linguagem natural e fluente em ${this.targetLang}
    - Evite traduções literais que soem não-naturais
-   - Adapte expressões idiomáticas mantendo o sentido original
+   - Adapte expressões idiomáticas mantendo o sentido
 
 5. RESTRIÇÕES:
    - NÃO adicione explicações, notas ou comentários
-   - NÃO omita ou resuma nenhuma parte do texto
-   - NÃO altere números, datas ou referências bíblicas
+   - NÃO omita ou resuma nenhuma parte
    - Retorne APENAS a tradução, sem prefácio ou conclusão
 
-TEXTO ORIGINAL (Português):
+TEXTO PARA TRADUZIR:
 ${originalText}
 
-TRADUÇÃO FIEL PARA ${targetLanguage.toUpperCase()}:
-`;
+TRADUÇÃO PARA ${this.targetLang.toUpperCase()}:`;
 
         try {
+            this.updateProgress('Conectando com IA...', 30);
+            await this.sleep(300);
+
+            this.updateProgress('Enviando texto...', 45);
+
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${this.geminiApiKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -178,6 +298,9 @@ TRADUÇÃO FIEL PARA ${targetLanguage.toUpperCase()}:
                     })
                 }
             );
+
+            this.updateProgress('Processando resposta...', 70);
+            await this.sleep(300);
 
             if (!response.ok) {
                 const error = await response.json();
@@ -191,6 +314,11 @@ TRADUÇÃO FIEL PARA ${targetLanguage.toUpperCase()}:
                 throw new Error('Resposta vazia da IA');
             }
 
+            this.updateProgress('Finalizando...', 90);
+            await this.sleep(300);
+
+            this.translatedText = translatedText;
+
             // Exibir tradução
             document.getElementById('translatedText').value = translatedText;
             this.updateCounter('translated', translatedText);
@@ -198,16 +326,28 @@ TRADUÇÃO FIEL PARA ${targetLanguage.toUpperCase()}:
             // Calcular e exibir estatísticas
             this.updateStatistics(originalText, translatedText);
 
+            // Mostrar botão de exportar
+            document.getElementById('exportButton').style.display = 'inline-flex';
+
+            this.updateProgress('Concluído!', 100);
+            await this.sleep(500);
+
+            this.closeProgressModal();
             this.showToast('✅ Tradução concluída com sucesso!', 'success');
 
         } catch (error) {
             console.error('Erro ao traduzir:', error);
+            this.closeProgressModal();
             this.showToast(`❌ Erro na tradução: ${error.message}`, 'error');
         } finally {
             this.isTranslating = false;
             translateButton.innerHTML = originalButtonText;
             translateButton.disabled = false;
         }
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     updateStatistics(originalText, translatedText) {
@@ -236,14 +376,82 @@ TRADUÇÃO FIEL PARA ${targetLanguage.toUpperCase()}:
         document.getElementById('statsPanel').style.display = 'grid';
     }
 
+    exportToTxt() {
+        if (!this.translatedText) {
+            this.showToast('⚠️ Não há tradução para exportar', 'warning');
+            return;
+        }
+
+        const now = new Date();
+        const timestamp = now.toISOString().slice(0, 19).replace(/:/g, '-');
+        const filename = `traducao_${this.sourceLang}_para_${this.targetLang}_${timestamp}.txt`;
+
+        const content = `===============================================
+TRADUÇÃO PROFISSIONAL AI
+Desenvolvido por: Tharcisio Nardoto
+Powered by: Google Gemini AI
+===============================================
+
+Data: ${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR')}
+Idioma de origem: ${this.sourceLang}
+Idioma de destino: ${this.targetLang}
+
+===============================================
+TEXTO ORIGINAL
+===============================================
+
+${this.originalText}
+
+===============================================
+TRADUÇÃO
+===============================================
+
+${this.translatedText}
+
+===============================================
+ESTATÍSTICAS
+===============================================
+
+Original:
+- Palavras: ${this.originalText.trim().split(/\s+/).length}
+- Caracteres: ${this.originalText.length}
+
+Tradução:
+- Palavras: ${this.translatedText.trim().split(/\s+/).length}
+- Caracteres: ${this.translatedText.length}
+
+===============================================
+`;
+
+        // Criar blob e fazer download
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        this.showToast('✅ Arquivo exportado com sucesso!', 'success');
+    }
+
     clearAll() {
         document.getElementById('originalText').value = '';
         document.getElementById('translatedText').value = '';
-        document.getElementById('languageSelector').value = '';
+        document.getElementById('sourceLangSelector').value = '';
+        document.getElementById('targetLangSelector').value = '';
+        document.getElementById('originalLanguageLabel').textContent = 'Texto Original';
         document.getElementById('translatedLanguageLabel').textContent = 'Tradução';
         document.getElementById('originalCounter').textContent = '0 caracteres';
         document.getElementById('translatedCounter').textContent = '0 caracteres';
         document.getElementById('statsPanel').style.display = 'none';
+        document.getElementById('exportButton').style.display = 'none';
+        this.translatedText = '';
+        this.originalText = '';
+        this.sourceLang = '';
+        this.targetLang = '';
         this.showToast('🗑️ Tudo limpo!', 'info');
     }
 
@@ -276,7 +484,7 @@ TRADUÇÃO FIEL PARA ${targetLanguage.toUpperCase()}:
 
         try {
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -331,18 +539,8 @@ TRADUÇÃO FIEL PARA ${targetLanguage.toUpperCase()}:
     }
 }
 
-// Add spinning animation for loading icon
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-`;
-document.head.appendChild(style);
-
 // Initialize app
 let translator;
 document.addEventListener('DOMContentLoaded', () => {
-    translator = new BiblicalTranslator();
+    translator = new ProfessionalTranslator();
 });

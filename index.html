@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Tradutor de Textos Religiosos - Powered by Google Gemini AI">
-    <title>Tradutor de Textos Religiosos - v1.0.0</title>
+    <meta name="description" content="Tradutor Profissional - Powered by Google Gemini AI">
+    <title>Tradutor Profissional - v2.0.0</title>
     <link rel="stylesheet" href="styles.css?v=2.8.6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,14 +62,14 @@
 
         textarea {
             width: 100%;
-            min-height: 400px;
+            min-height: 600px;
             padding: 1.5rem;
             padding-bottom: 2.5rem;
             border: 2px solid var(--border-color);
             border-radius: var(--radius-sm);
             font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            line-height: 1.6;
+            font-size: 1rem;
+            line-height: 1.7;
             resize: vertical;
             background: var(--bg-secondary);
             color: var(--text-primary);
@@ -163,8 +163,8 @@
     <header class="header">
         <div class="header-content">
             <div class="logo">
-                <h1>🌐 TRADUTOR DE TEXTOS RELIGIOSOS</h1>
-                <span class="version">v1.0.0</span>
+                <h1>🌐 TRADUTOR PROFISSIONAL AI</h1>
+                <span class="version">v2.0.0</span>
             </div>
             <div class="header-actions">
                 <button id="settingsButton" class="btn-icon" title="Configurações">
@@ -180,29 +180,49 @@
     <!-- Main Content -->
     <div class="translator-container">
         <div class="translator-header">
-            <h1>🌐 Tradutor de Textos Religiosos</h1>
-            <p style="color: var(--text-secondary); font-size: 1.1rem;">Tradução especializada para roteiros de documentários bíblicos</p>
+            <h1>🌐 Tradutor Profissional AI</h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">Traduções precisas e profissionais com inteligência artificial</p>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">Desenvolvido por <strong>Tharcisio Nardoto</strong> | Powered by Google Gemini AI</p>
         </div>
 
         <!-- Controls -->
         <div class="controls">
-            <select id="languageSelector" class="root-folder-dropdown" style="flex: 1; max-width: 300px;">
-                <option value="" disabled selected>Selecione o idioma de destino...</option>
+            <select id="sourceLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 250px;">
+                <option value="" disabled selected>Idioma de origem...</option>
+                <option value="auto">🔄 Detectar automaticamente</option>
+                <option value="portuguese">🇧🇷 Português</option>
                 <option value="english">🇺🇸 Inglês</option>
-                <option value="portuguese">🇧🇷 Português (Brasil)</option>
                 <option value="spanish">🇪🇸 Espanhol</option>
                 <option value="french">🇫🇷 Francês</option>
                 <option value="italian">🇮🇹 Italiano</option>
                 <option value="german">🇩🇪 Alemão</option>
             </select>
 
-            <button id="translateButton" class="btn-primary" style="padding: 0 3rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+
+            <select id="targetLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 250px;">
+                <option value="" disabled selected>Idioma de destino...</option>
+                <option value="english">🇺🇸 Inglês</option>
+                <option value="portuguese">🇧🇷 Português</option>
+                <option value="spanish">🇪🇸 Espanhol</option>
+                <option value="french">🇫🇷 Francês</option>
+                <option value="italian">🇮🇹 Italiano</option>
+                <option value="german">🇩🇪 Alemão</option>
+            </select>
+
+            <button id="translateButton" class="btn-primary" style="padding: 0 2.5rem;">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-right: 0.5rem;">
                     <path d="M10 2C14.418 2 18 5.582 18 10C18 14.418 14.418 18 10 18C5.582 18 2 14.418 2 10C2 5.582 5.582 2 10 2Z" stroke="currentColor" stroke-width="2"/>
                     <path d="M7 10L10 7L13 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M10 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 Traduzir
+            </button>
+
+            <button id="exportButton" class="btn-secondary" style="display: none;">
+                💾 Exportar TXT
             </button>
 
             <button id="clearButton" class="btn-secondary">
@@ -219,7 +239,7 @@
                         <path d="M4 4h12v12H4V4z" stroke="currentColor" stroke-width="2"/>
                         <path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="2"/>
                     </svg>
-                    Texto Original (Português)
+                    <span id="originalLanguageLabel">Texto Original</span>
                 </h3>
                 <div class="text-area-wrapper">
                     <textarea id="originalText" placeholder="Cole aqui o texto que deseja traduzir..."></textarea>
