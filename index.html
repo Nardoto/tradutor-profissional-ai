@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tradutor de Textos Religiosos - Powered by Google Gemini AI">
+    <title>Tradutor de Textos Religiosos - v1.0.0</title>
+    <link rel="stylesheet" href="styles.css?v=2.8.6">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .translator-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .translator-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .translator-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .translator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .text-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .text-area-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: 0.75rem;
+            right: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 1.5rem;
+            padding-bottom: 2.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        textarea[readonly] {
+            background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%);
+            border-color: #667eea;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            margin-bottom: 2rem;
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-box {
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border-color);
+        }
+
+        .stats-box.translated {
+            background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%);
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .stat-value.translated {
+            color: #667eea;
+        }
+
+        .stat-diff {
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .translator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🌐 TRADUTOR DE TEXTOS RELIGIOSOS</h1>
+                <span class="version">v1.0.0</span>
+            </div>
+            <div class="header-actions">
+                <button id="settingsButton" class="btn-icon" title="Configurações">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M16.2 12.5L15.4 13.9C15.1 14.5 15.2 15.2 15.7 15.7L16.3 16.3C16.5 16.5 16.5 16.8 16.3 17L17 17.7C17.2 17.9 17.5 17.9 17.7 17.7L18.3 17.1C18.8 16.6 19.5 16.5 20.1 16.8L21.5 17.6C21.8 17.8 22 18.1 22 18.5V19.5C22 19.8 21.8 20 21.5 20H18.5C18.2 20 18 19.8 18 19.5V18.5C18 18.1 17.8 17.8 17.5 17.6L16.1 16.8C15.5 16.5 14.8 16.6 14.3 17.1L13.7 17.7C13.5 17.9 13.2 17.9 13 17.7L12.3 17C12.1 16.8 12.1 16.5 12.3 16.3L12.9 15.7C13.4 15.2 13.5 14.5 13.2 13.9L12.4 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="translator-container">
+        <div class="translator-header">
+            <h1>🌐 Tradutor de Textos Religiosos</h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">Tradução especializada para roteiros de documentários bíblicos</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <select id="languageSelector" class="root-folder-dropdown" style="flex: 1; max-width: 300px;">
+                <option value="" disabled selected>Selecione o idioma de destino...</option>
+                <option value="english">🇺🇸 Inglês</option>
+                <option value="portuguese">🇧🇷 Português (Brasil)</option>
+                <option value="spanish">🇪🇸 Espanhol</option>
+                <option value="french">🇫🇷 Francês</option>
+                <option value="italian">🇮🇹 Italiano</option>
+                <option value="german">🇩🇪 Alemão</option>
+            </select>
+
+            <button id="translateButton" class="btn-primary" style="padding: 0 3rem;">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-right: 0.5rem;">
+                    <path d="M10 2C14.418 2 18 5.582 18 10C18 14.418 14.418 18 10 18C5.582 18 2 14.418 2 10C2 5.582 5.582 2 10 2Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M7 10L10 7L13 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Traduzir
+            </button>
+
+            <button id="clearButton" class="btn-secondary">
+                🗑️ Limpar
+            </button>
+        </div>
+
+        <!-- Text Areas -->
+        <div class="translator-grid">
+            <!-- Original Text -->
+            <div class="text-panel">
+                <h3 style="color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4 4h12v12H4V4z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Texto Original (Português)
+                </h3>
+                <div class="text-area-wrapper">
+                    <textarea id="originalText" placeholder="Cole aqui o texto que deseja traduzir..."></textarea>
+                    <div class="char-counter" id="originalCounter">0 caracteres</div>
+                </div>
+                <button id="copyOriginalButton" class="btn-secondary" style="width: 100%;">
+                    📋 Copiar Original
+                </button>
+            </div>
+
+            <!-- Translated Text -->
+            <div class="text-panel">
+                <h3 style="color: #667eea; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 2C14.418 2 18 5.582 18 10C18 14.418 14.418 18 10 18C5.582 18 2 14.418 2 10C2 5.582 5.582 2 10 2Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span id="translatedLanguageLabel">Tradução</span>
+                </h3>
+                <div class="text-area-wrapper">
+                    <textarea id="translatedText" readonly placeholder="A tradução aparecerá aqui..."></textarea>
+                    <div class="char-counter" id="translatedCounter">0 caracteres</div>
+                </div>
+                <button id="copyTranslatedButton" class="btn-primary" style="width: 100%;">
+                    📋 Copiar Tradução
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-panel" id="statsPanel" style="display: none;">
+            <div class="stats-box">
+                <h4 style="color: var(--accent-primary); margin: 0 0 1rem 0;">📝 Texto Original</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Palavras</div>
+                        <div class="stat-value" id="originalWords">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Caracteres</div>
+                        <div class="stat-value" id="originalChars">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-box translated">
+                <h4 style="color: #667eea; margin: 0 0 1rem 0;">🌐 Tradução</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Palavras</div>
+                        <div class="stat-value translated" id="translatedWords">
+                            0
+                            <span class="stat-diff" id="wordsDiff"></span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Caracteres</div>
+                        <div class="stat-value translated" id="translatedChars">
+                            0
+                            <span class="stat-diff" id="charsDiff"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>⚙️ Configurações</h2>
+                <button class="modal-close" onclick="document.getElementById('settingsModal').style.display='none'">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        🔑 API Key do Google Gemini
+                    </label>
+                    <input
+                        type="password"
+                        id="apiKeyInput"
+                        placeholder="Cole sua API Key aqui..."
+                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-family: 'Courier New', monospace;"
+                    >
+                    <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                        Obtenha sua chave gratuita em:
+                        <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary);">Google AI Studio</a>
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem;">
+                    <button id="saveApiKeyButton" class="btn-primary" style="flex: 1;">
+                        💾 Salvar
+                    </button>
+                    <button id="testApiKeyButton" class="btn-secondary" style="flex: 1;">
+                        🧪 Testar Conexão
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="translator.js?v=1.0.0"></script>
+</body>
+</html>
