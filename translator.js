@@ -2,12 +2,12 @@
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
 // Version: 2.0.0
-// Desenvolvido por: Tharcisio Nardoto
+// Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.0.0 - by Tharcisio Nardoto');
+        console.log('🌐 Tradutor Profissional AI v2.0.0 - by Nardoto');
 
         this.geminiApiKey = null;
         this.isTranslating = false;
@@ -388,7 +388,7 @@ TRADUÇÃO PARA ${this.targetLang.toUpperCase()}:`;
 
         const content = `===============================================
 TRADUÇÃO PROFISSIONAL AI
-Desenvolvido por: Tharcisio Nardoto
+Desenvolvido por: Nardoto
 Powered by: Google Gemini AI
 ===============================================
 

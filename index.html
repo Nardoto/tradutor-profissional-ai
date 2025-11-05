@@ -159,36 +159,25 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <h1>🌐 TRADUTOR PROFISSIONAL AI</h1>
-                <span class="version">v2.0.0</span>
-            </div>
-            <div class="header-actions">
-                <button id="settingsButton" class="btn-icon" title="Configurações">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M16.2 12.5L15.4 13.9C15.1 14.5 15.2 15.2 15.7 15.7L16.3 16.3C16.5 16.5 16.5 16.8 16.3 17L17 17.7C17.2 17.9 17.5 17.9 17.7 17.7L18.3 17.1C18.8 16.6 19.5 16.5 20.1 16.8L21.5 17.6C21.8 17.8 22 18.1 22 18.5V19.5C22 19.8 21.8 20 21.5 20H18.5C18.2 20 18 19.8 18 19.5V18.5C18 18.1 17.8 17.8 17.5 17.6L16.1 16.8C15.5 16.5 14.8 16.6 14.3 17.1L13.7 17.7C13.5 17.9 13.2 17.9 13 17.7L12.3 17C12.1 16.8 12.1 16.5 12.3 16.3L12.9 15.7C13.4 15.2 13.5 14.5 13.2 13.9L12.4 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </header>
-
     <!-- Main Content -->
     <div class="translator-container">
-        <div class="translator-header">
-            <h1>🌐 Tradutor Profissional AI</h1>
-            <p style="color: var(--text-secondary); font-size: 1.1rem;">Traduções precisas e profissionais com inteligência artificial</p>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">Desenvolvido por <strong>Tharcisio Nardoto</strong> | Powered by Google Gemini AI</p>
+        <div class="translator-header" style="position: relative;">
+            <h1 style="margin-bottom: 0.5rem;">🌐 Tradutor Profissional AI</h1>
+            <p style="color: var(--text-secondary); font-size: 1rem; margin: 0.5rem 0;">Traduções precisas e profissionais com inteligência artificial</p>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.5rem 0 2rem 0;">Desenvolvido por <strong>Nardoto</strong> | Powered by Google Gemini AI</p>
+
+            <button id="settingsButton" class="btn-primary" style="position: absolute; top: 0; right: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16.2 12.5L15.4 13.9C15.1 14.5 15.2 15.2 15.7 15.7L16.3 16.3C16.5 16.5 16.5 16.8 16.3 17L17 17.7C17.2 17.9 17.5 17.9 17.7 17.7L18.3 17.1C18.8 16.6 19.5 16.5 20.1 16.8L21.5 17.6C21.8 17.8 22 18.1 22 18.5V19.5C22 19.8 21.8 20 21.5 20H18.5C18.2 20 18 19.8 18 19.5V18.5C18 18.1 17.8 17.8 17.5 17.6L16.1 16.8C15.5 16.5 14.8 16.6 14.3 17.1L13.7 17.7C13.5 17.9 13.2 17.9 13 17.7L12.3 17C12.1 16.8 12.1 16.5 12.3 16.3L12.9 15.7C13.4 15.2 13.5 14.5 13.2 13.9L12.4 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Configurar API Key
+            </button>
         </div>
 
         <!-- Controls -->
         <div class="controls">
             <select id="sourceLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 250px;">
-                <option value="" disabled selected>Idioma de origem...</option>
                 <option value="auto">🔄 Detectar automaticamente</option>
                 <option value="portuguese">🇧🇷 Português</option>
                 <option value="english">🇺🇸 Inglês</option>
@@ -324,10 +313,18 @@
                         placeholder="Cole sua API Key aqui..."
                         style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-family: 'Courier New', monospace;"
                     >
-                    <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
-                        Obtenha sua chave gratuita em:
-                        <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary);">Google AI Studio</a>
-                    </p>
+                    <div style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-left: 3px solid var(--accent-primary); border-radius: var(--radius-sm);">
+                        <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-primary); font-size: 0.95rem;">📚 Como obter sua API Key GRATUITA:</h4>
+                        <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                            <li>Acesse o <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary); font-weight: 500;">Google AI Studio</a></li>
+                            <li>Faça login com sua conta Google</li>
+                            <li>Clique em "Get API Key" ou "Create API Key"</li>
+                            <li>Copie a chave gerada e cole acima</li>
+                        </ol>
+                        <p style="margin: 0.75rem 0 0 0; font-size: 0.8rem; color: #10b981; font-weight: 500;">
+                            ✅ É 100% GRATUITO! Sem necessidade de cartão de crédito.
+                        </p>
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: 0.75rem;">
@@ -346,6 +343,6 @@
     <div id="toast" class="toast"></div>
 
     <!-- Scripts -->
-    <script src="translator.js?v=1.0.0"></script>
+    <script src="translator.js?v=2.0.0"></script>
 </body>
 </html>
