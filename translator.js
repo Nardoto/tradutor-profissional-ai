@@ -1,13 +1,13 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 2.1.0 - Exportação SRT adicionada
+// Version: 2.1.2 - Bug fixes
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.1.0 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v2.1.2 - by Nardoto');
 
         this.geminiApiKey = null;
         this.isTranslating = false;
@@ -371,17 +371,31 @@ TRADUÇÃO PARA ${this.targetLang.toUpperCase()}:`;
         const wordsColor = Math.abs(wordsDiff) > 10 ? '#f59e0b' : '#10b981';
         const charsColor = Math.abs(charsDiff) > 10 ? '#f59e0b' : '#10b981';
 
-        // Atualizar DOM
-        document.getElementById('originalWords').textContent = originalWords.toLocaleString();
-        document.getElementById('originalChars').textContent = originalChars.toLocaleString();
-        document.getElementById('translatedWords').textContent = translatedWords.toLocaleString();
-        document.getElementById('translatedChars').textContent = translatedChars.toLocaleString();
+        // Atualizar DOM com verificações de null
+        const originalWordsEl = document.getElementById('originalWords');
+        const originalCharsEl = document.getElementById('originalChars');
+        const translatedWordsEl = document.getElementById('translatedWords');
+        const translatedCharsEl = document.getElementById('translatedChars');
+        const wordsDiffEl = document.getElementById('wordsDiff');
+        const charsDiffEl = document.getElementById('charsDiff');
+        const statsPanelEl = document.getElementById('statsPanel');
 
-        document.getElementById('wordsDiff').innerHTML = `<span style="color: ${wordsColor}">(${wordsDiff > 0 ? '+' : ''}${wordsDiff}%)</span>`;
-        document.getElementById('charsDiff').innerHTML = `<span style="color: ${charsColor}">(${charsDiff > 0 ? '+' : ''}${charsDiff}%)</span>`;
+        if (originalWordsEl) originalWordsEl.textContent = originalWords.toLocaleString();
+        if (originalCharsEl) originalCharsEl.textContent = originalChars.toLocaleString();
+        if (translatedWordsEl) translatedWordsEl.textContent = translatedWords.toLocaleString();
+        if (translatedCharsEl) translatedCharsEl.textContent = translatedChars.toLocaleString();
 
-        // Mostrar painel de estatísticas
-        document.getElementById('statsPanel').style.display = 'grid';
+        if (wordsDiffEl) {
+            wordsDiffEl.innerHTML = `<span style="color: ${wordsColor}">(${wordsDiff > 0 ? '+' : ''}${wordsDiff}%)</span>`;
+        }
+        if (charsDiffEl) {
+            charsDiffEl.innerHTML = `<span style="color: ${charsColor}">(${charsDiff > 0 ? '+' : ''}${charsDiff}%)</span>`;
+        }
+
+        // Mostrar painel de estatísticas se existir
+        if (statsPanelEl) {
+            statsPanelEl.style.display = 'grid';
+        }
     }
 
     exportToTxt() {
