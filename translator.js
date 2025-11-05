@@ -1,13 +1,13 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 2.0.0
+// Version: 2.1.0 - Exportação SRT adicionada
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.0.0 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v2.1.0 - by Nardoto');
 
         this.geminiApiKey = null;
         this.isTranslating = false;
@@ -34,6 +34,10 @@ class ProfessionalTranslator {
 
         document.getElementById('exportButton').addEventListener('click', () => {
             this.exportToTxt();
+        });
+
+        document.getElementById('exportSrtButton').addEventListener('click', () => {
+            this.exportToSrt();
         });
 
         document.getElementById('settingsButton').addEventListener('click', () => {
@@ -326,8 +330,12 @@ TRADUÇÃO PARA ${this.targetLang.toUpperCase()}:`;
             // Calcular e exibir estatísticas
             this.updateStatistics(originalText, translatedText);
 
-            // Mostrar botão de exportar
+            // Mostrar botões de exportar
             document.getElementById('exportButton').style.display = 'inline-flex';
+            document.getElementById('exportSrtButton').style.display = 'inline-flex';
+
+            // Mostrar painel de configurações SRT
+            document.getElementById('srtSettingsPanel').style.display = 'block';
 
             this.updateProgress('Concluído!', 100);
             await this.sleep(500);
@@ -437,6 +445,105 @@ Tradução:
         this.showToast('✅ Arquivo exportado com sucesso!', 'success');
     }
 
+    exportToSrt() {
+        if (!this.translatedText) {
+            this.showToast('⚠️ Não há tradução para exportar', 'warning');
+            return;
+        }
+
+        // Pegar configurações
+        const charsPerBlock = parseInt(document.getElementById('srtCharsPerBlock').value) || 84;
+        const readingRate = parseInt(document.getElementById('srtReadingRate').value) || 14;
+
+        // Dividir texto em blocos respeitando limites e pontuação
+        const blocks = this.divideTextForSrt(this.translatedText, charsPerBlock);
+
+        // Gerar conteúdo SRT
+        let srtContent = '';
+        let currentTime = 0;
+
+        blocks.forEach((block, index) => {
+            const duration = block.length / readingRate;
+            const startTime = this.formatSrtTime(currentTime);
+            const endTime = this.formatSrtTime(currentTime + duration);
+
+            srtContent += `${index + 1}\n`;
+            srtContent += `${startTime} --> ${endTime}\n`;
+            srtContent += `${block}\n\n`;
+
+            currentTime += duration;
+        });
+
+        // Criar arquivo SRT
+        const now = new Date();
+        const timestamp = now.toISOString().slice(0, 19).replace(/:/g, '-');
+        const filename = `legenda_${this.targetLang}_${timestamp}.srt`;
+
+        const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        this.showToast(`✅ Legenda SRT exportada! ${blocks.length} blocos gerados`, 'success');
+    }
+
+    divideTextForSrt(text, maxChars) {
+        // Quebrar por sentenças primeiro
+        const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+        const blocks = [];
+        let currentBlock = '';
+
+        sentences.forEach(sentence => {
+            sentence = sentence.trim();
+
+            // Se a sentença sozinha já é maior que o limite, quebrar por palavras
+            if (sentence.length > maxChars) {
+                if (currentBlock) {
+                    blocks.push(currentBlock.trim());
+                    currentBlock = '';
+                }
+
+                const words = sentence.split(' ');
+                words.forEach(word => {
+                    if ((currentBlock + ' ' + word).length > maxChars) {
+                        blocks.push(currentBlock.trim());
+                        currentBlock = word;
+                    } else {
+                        currentBlock += (currentBlock ? ' ' : '') + word;
+                    }
+                });
+            } else {
+                // Verificar se cabe no bloco atual
+                if ((currentBlock + ' ' + sentence).length > maxChars) {
+                    blocks.push(currentBlock.trim());
+                    currentBlock = sentence;
+                } else {
+                    currentBlock += (currentBlock ? ' ' : '') + sentence;
+                }
+            }
+        });
+
+        if (currentBlock) {
+            blocks.push(currentBlock.trim());
+        }
+
+        return blocks.filter(block => block.length > 0);
+    }
+
+    formatSrtTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        const millis = Math.floor((seconds % 1) * 1000);
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(millis).padStart(3, '0')}`;
+    }
+
     clearAll() {
         document.getElementById('originalText').value = '';
         document.getElementById('translatedText').value = '';
@@ -448,6 +555,8 @@ Tradução:
         document.getElementById('translatedCounter').textContent = '0 caracteres';
         document.getElementById('statsPanel').style.display = 'none';
         document.getElementById('exportButton').style.display = 'none';
+        document.getElementById('exportSrtButton').style.display = 'none';
+        document.getElementById('srtSettingsPanel').style.display = 'none';
         this.translatedText = '';
         this.originalText = '';
         this.sourceLang = '';

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Tradutor Profissional - Powered by Google Gemini AI">
-    <title>Tradutor Profissional - v2.0.0</title>
+    <title>Tradutor Profissional - v2.1.0</title>
     <link rel="stylesheet" href="styles.css?v=2.8.6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -214,9 +214,50 @@
                 💾 Exportar TXT
             </button>
 
+            <button id="exportSrtButton" class="btn-secondary" style="display: none;">
+                🎬 Exportar SRT
+            </button>
+
             <button id="clearButton" class="btn-secondary">
                 🗑️ Limpar
             </button>
+        </div>
+
+        <!-- SRT Settings Panel (oculto por padrão) -->
+        <div id="srtSettingsPanel" style="display: none; background: var(--bg-secondary); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 2rem;">
+            <h4 style="color: var(--accent-primary); margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M3 5C3 3.89543 3.89543 3 5 3H15C16.1046 3 17 3.89543 17 5V15C17 16.1046 16.1046 17 15 17H5C3.89543 17 3 16.1046 3 15V5Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M7 8H13M7 12H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Configurações de Legendas (SRT)
+            </h4>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        📏 Caracteres por legenda:
+                    </label>
+                    <input type="number" id="srtCharsPerBlock" value="84" min="40" max="200"
+                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 60-84 caracteres</small>
+                </div>
+
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        ⚡ Caracteres por segundo:
+                    </label>
+                    <input type="number" id="srtReadingRate" value="14" min="10" max="25" step="1"
+                           style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 14-17 c/s</small>
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
+                    <strong>💡 Dica:</strong> A legenda será automaticamente dividida em blocos de acordo com os parâmetros acima, respeitando quebras de frase.
+                </p>
+            </div>
         </div>
 
         <!-- Text Areas -->
@@ -377,6 +418,6 @@
     <div id="toast" class="toast"></div>
 
     <!-- Scripts -->
-    <script src="translator.js?v=2.0.0"></script>
+    <script src="translator.js?v=2.1.0"></script>
 </body>
 </html>
