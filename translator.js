@@ -1,13 +1,13 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 2.3.0 - Sistema de chunks automáticos para textos grandes
+// Version: 2.3.1 - Contador de tempo e relatório de duração da tradução
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.3.0 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v2.3.1 - by Nardoto');
 
         this.geminiApiKey = null;
         this.isTranslating = false;
@@ -20,6 +20,11 @@ class ProfessionalTranslator {
         this.MAX_CHARS_PER_CHUNK = 25000; // ~6.000-7.000 tokens seguros
         this.currentChunk = 0;
         this.totalChunks = 0;
+
+        // Controle de tempo
+        this.startTime = null;
+        this.timerInterval = null;
+        this.elapsedSeconds = 0;
 
         this.init();
     }
@@ -149,7 +154,15 @@ class ProfessionalTranslator {
                             <div id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem;"></div>
                         </div>
 
-                        <p id="progressText" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 500; margin: 0;"></p>
+                        <p id="progressText" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 500; margin: 0 0 1rem 0;"></p>
+
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-radius: var(--radius-sm); border: 2px solid #667eea33;">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#667eea" stroke-width="2">
+                                <circle cx="10" cy="10" r="8"/>
+                                <path d="M10 6v4l3 2"/>
+                            </svg>
+                            <span id="timerDisplay" style="color: #667eea; font-weight: 600; font-size: 1rem;">00:00</span>
+                        </div>
                     </div>
 
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
@@ -191,6 +204,47 @@ class ProfessionalTranslator {
         if (modal) {
             modal.remove();
         }
+    }
+
+    startTimer() {
+        this.startTime = Date.now();
+        this.elapsedSeconds = 0;
+        this.updateTimerDisplay();
+
+        this.timerInterval = setInterval(() => {
+            this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+            this.updateTimerDisplay();
+        }, 1000);
+    }
+
+    stopTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+        this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+        return this.elapsedSeconds;
+    }
+
+    updateTimerDisplay() {
+        const timerDisplay = document.getElementById('timerDisplay');
+        if (timerDisplay) {
+            const minutes = Math.floor(this.elapsedSeconds / 60);
+            const seconds = this.elapsedSeconds % 60;
+            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+    }
+
+    formatElapsedTime(seconds) {
+        if (seconds < 60) {
+            return `${seconds} segundo${seconds !== 1 ? 's' : ''}`;
+        }
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        if (remainingSeconds === 0) {
+            return `${minutes} minuto${minutes !== 1 ? 's' : ''}`;
+        }
+        return `${minutes} minuto${minutes !== 1 ? 's' : ''} e ${remainingSeconds} segundo${remainingSeconds !== 1 ? 's' : ''}`;
     }
 
     async translate() {
@@ -244,6 +298,7 @@ class ProfessionalTranslator {
 
         // Mostrar modal de progresso
         this.showProgressModal();
+        this.startTimer(); // Iniciar contador de tempo
         this.updateProgress('Iniciando tradução...', 0);
 
         await this.sleep(300);
@@ -333,16 +388,22 @@ class ProfessionalTranslator {
             this.updateProgress('Concluído!', 100);
             await this.sleep(500);
 
+            // Parar timer e calcular tempo total
+            const totalSeconds = this.stopTimer();
+            const timeFormatted = this.formatElapsedTime(totalSeconds);
+
             this.closeProgressModal();
 
+            // Mostrar mensagem de sucesso com tempo
             if (this.totalChunks > 1) {
-                this.showToast(`✅ Tradução concluída! ${this.totalChunks} partes processadas com sucesso`, 'success');
+                this.showToast(`✅ Tradução concluída! ${this.totalChunks} partes processadas em ${timeFormatted}`, 'success');
             } else {
-                this.showToast('✅ Tradução concluída com sucesso!', 'success');
+                this.showToast(`✅ Tradução concluída em ${timeFormatted}!`, 'success');
             }
 
         } catch (error) {
             console.error('Erro ao traduzir:', error);
+            this.stopTimer();
             this.closeProgressModal();
             this.showToast(`❌ Erro na tradução: ${error.message}`, 'error');
         } finally {
