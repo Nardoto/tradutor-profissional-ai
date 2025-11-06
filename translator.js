@@ -1,13 +1,13 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 2.2.0 - Banner informativo e melhorias UX
+// Version: 2.3.0 - Sistema de chunks automáticos para textos grandes
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.2.0 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v2.3.0 - by Nardoto');
 
         this.geminiApiKey = null;
         this.isTranslating = false;
@@ -15,6 +15,11 @@ class ProfessionalTranslator {
         this.originalText = '';
         this.sourceLang = '';
         this.targetLang = '';
+
+        // Configuração de chunks para textos grandes
+        this.MAX_CHARS_PER_CHUNK = 25000; // ~6.000-7.000 tokens seguros
+        this.currentChunk = 0;
+        this.totalChunks = 0;
 
         this.init();
     }
@@ -248,9 +253,170 @@ class ProfessionalTranslator {
             ? 'detecte automaticamente o idioma de origem e'
             : `do ${this.sourceLang} para`;
 
+        try {
+            // Verificar se precisa dividir em chunks
+            const chunks = this.divideTextIntoChunks(originalText, this.MAX_CHARS_PER_CHUNK);
+            this.totalChunks = chunks.length;
+
+            if (this.totalChunks > 1) {
+                this.updateProgress(`📚 Texto grande detectado! Dividido em ${this.totalChunks} partes`, 10);
+                await this.sleep(800);
+            } else {
+                this.updateProgress('Iniciando tradução...', 10);
+                await this.sleep(300);
+            }
+
+            const translatedChunks = [];
+
+            // Traduzir cada chunk
+            for (let i = 0; i < chunks.length; i++) {
+                this.currentChunk = i + 1;
+                const chunk = chunks[i];
+
+                // Calcular progresso baseado no chunk atual
+                const baseProgress = 10;
+                const translationProgress = 80;
+                const chunkProgress = baseProgress + (translationProgress * (i / chunks.length));
+
+                if (this.totalChunks > 1) {
+                    this.updateProgress(`📝 Traduzindo parte ${this.currentChunk} de ${this.totalChunks}...`, Math.floor(chunkProgress));
+                } else {
+                    this.updateProgress('Conectando com IA...', 30);
+                }
+                await this.sleep(300);
+
+                if (this.totalChunks === 1) {
+                    this.updateProgress('Enviando texto...', 45);
+                }
+
+                // Traduzir chunk
+                const translatedChunk = await this.translateChunk(chunk, sourceLanguageText, this.targetLang);
+                translatedChunks.push(translatedChunk);
+
+                if (this.totalChunks > 1) {
+                    const nextProgress = baseProgress + (translationProgress * ((i + 1) / chunks.length));
+                    this.updateProgress(`✅ Parte ${this.currentChunk} de ${this.totalChunks} concluída`, Math.floor(nextProgress));
+                    await this.sleep(500);
+
+                    // Pausa entre chunks para não sobrecarregar a API
+                    if (i < chunks.length - 1) {
+                        this.updateProgress(`⏳ Aguardando para próxima parte...`, Math.floor(nextProgress));
+                        await this.sleep(1500);
+                    }
+                } else {
+                    this.updateProgress('Processando resposta...', 70);
+                    await this.sleep(300);
+                }
+            }
+
+            // Juntar todas as traduções
+            this.updateProgress('Finalizando e juntando partes...', 90);
+            await this.sleep(300);
+
+            // Juntar chunks com espaço duplo entre eles
+            this.translatedText = translatedChunks.join('\n\n');
+
+            // Exibir tradução
+            document.getElementById('translatedText').value = this.translatedText;
+            this.updateCounter('translated', this.translatedText);
+
+            // Calcular e exibir estatísticas
+            this.updateStatistics(originalText, this.translatedText);
+
+            // Mostrar botões de exportar
+            document.getElementById('exportButton').style.display = 'inline-flex';
+            document.getElementById('exportSrtButton').style.display = 'inline-flex';
+
+            // Mostrar painel de configurações SRT
+            document.getElementById('srtSettingsPanel').style.display = 'block';
+
+            this.updateProgress('Concluído!', 100);
+            await this.sleep(500);
+
+            this.closeProgressModal();
+
+            if (this.totalChunks > 1) {
+                this.showToast(`✅ Tradução concluída! ${this.totalChunks} partes processadas com sucesso`, 'success');
+            } else {
+                this.showToast('✅ Tradução concluída com sucesso!', 'success');
+            }
+
+        } catch (error) {
+            console.error('Erro ao traduzir:', error);
+            this.closeProgressModal();
+            this.showToast(`❌ Erro na tradução: ${error.message}`, 'error');
+        } finally {
+            this.isTranslating = false;
+            translateButton.innerHTML = originalButtonText;
+            translateButton.disabled = false;
+        }
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /**
+     * Divide texto em chunks inteligentes respeitando parágrafos e sentenças
+     */
+    divideTextIntoChunks(text, maxChars) {
+        if (text.length <= maxChars) {
+            return [text];
+        }
+
+        const chunks = [];
+        let remainingText = text;
+
+        while (remainingText.length > 0) {
+            if (remainingText.length <= maxChars) {
+                chunks.push(remainingText);
+                break;
+            }
+
+            // Tentar dividir por parágrafo duplo primeiro
+            let cutPoint = remainingText.lastIndexOf('\n\n', maxChars);
+
+            // Se não encontrar parágrafo duplo, tentar parágrafo simples
+            if (cutPoint === -1 || cutPoint < maxChars * 0.7) {
+                cutPoint = remainingText.lastIndexOf('\n', maxChars);
+            }
+
+            // Se não encontrar quebra de linha, tentar ponto final
+            if (cutPoint === -1 || cutPoint < maxChars * 0.7) {
+                cutPoint = remainingText.lastIndexOf('. ', maxChars);
+                if (cutPoint !== -1) cutPoint += 1; // Incluir o ponto
+            }
+
+            // Se não encontrar ponto, tentar vírgula
+            if (cutPoint === -1 || cutPoint < maxChars * 0.7) {
+                cutPoint = remainingText.lastIndexOf(', ', maxChars);
+                if (cutPoint !== -1) cutPoint += 1;
+            }
+
+            // Último recurso: dividir por espaço
+            if (cutPoint === -1 || cutPoint < maxChars * 0.7) {
+                cutPoint = remainingText.lastIndexOf(' ', maxChars);
+            }
+
+            // Se ainda não encontrou, força divisão no limite
+            if (cutPoint === -1) {
+                cutPoint = maxChars;
+            }
+
+            chunks.push(remainingText.substring(0, cutPoint).trim());
+            remainingText = remainingText.substring(cutPoint).trim();
+        }
+
+        return chunks;
+    }
+
+    /**
+     * Traduz um único chunk
+     */
+    async translateChunk(chunk, sourceLanguageText, targetLang) {
         const prompt = `Você é um tradutor profissional especializado.
 
-TAREFA: ${sourceLanguageText} traduza o texto abaixo para ${this.targetLang}, mantendo TOTAL FIDELIDADE ao conteúdo original.
+TAREFA: ${sourceLanguageText} traduza o texto abaixo para ${targetLang}, mantendo TOTAL FIDELIDADE ao conteúdo original.
 
 INSTRUÇÕES CRÍTICAS:
 1. PRESERVAÇÃO DE CONTEÚDO:
@@ -270,7 +436,7 @@ INSTRUÇÕES CRÍTICAS:
    - Mantenha títulos e subtítulos sem alteração de formato
 
 4. QUALIDADE:
-   - Use linguagem natural e fluente em ${this.targetLang}
+   - Use linguagem natural e fluente em ${targetLang}
    - Evite traduções literais que soem não-naturais
    - Adapte expressões idiomáticas mantendo o sentido
 
@@ -278,84 +444,39 @@ INSTRUÇÕES CRÍTICAS:
    - NÃO adicione explicações, notas ou comentários
    - NÃO omita ou resuma nenhuma parte
    - Retorne APENAS a tradução, sem prefácio ou conclusão
+   - Este texto faz parte de um documento maior, então NÃO adicione introduções ou conclusões
 
 TEXTO PARA TRADUZIR:
-${originalText}
+${chunk}
 
-TRADUÇÃO PARA ${this.targetLang.toUpperCase()}:`;
+TRADUÇÃO PARA ${targetLang.toUpperCase()}:`;
 
-        try {
-            this.updateProgress('Conectando com IA...', 30);
-            await this.sleep(300);
-
-            this.updateProgress('Enviando texto...', 45);
-
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${this.geminiApiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: prompt }]
-                        }]
-                    })
-                }
-            );
-
-            this.updateProgress('Processando resposta...', 70);
-            await this.sleep(300);
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error?.message || 'Erro na API');
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${this.geminiApiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }]
+                })
             }
+        );
 
-            const data = await response.json();
-            const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            if (!translatedText) {
-                throw new Error('Resposta vazia da IA');
-            }
-
-            this.updateProgress('Finalizando...', 90);
-            await this.sleep(300);
-
-            this.translatedText = translatedText;
-
-            // Exibir tradução
-            document.getElementById('translatedText').value = translatedText;
-            this.updateCounter('translated', translatedText);
-
-            // Calcular e exibir estatísticas
-            this.updateStatistics(originalText, translatedText);
-
-            // Mostrar botões de exportar
-            document.getElementById('exportButton').style.display = 'inline-flex';
-            document.getElementById('exportSrtButton').style.display = 'inline-flex';
-
-            // Mostrar painel de configurações SRT
-            document.getElementById('srtSettingsPanel').style.display = 'block';
-
-            this.updateProgress('Concluído!', 100);
-            await this.sleep(500);
-
-            this.closeProgressModal();
-            this.showToast('✅ Tradução concluída com sucesso!', 'success');
-
-        } catch (error) {
-            console.error('Erro ao traduzir:', error);
-            this.closeProgressModal();
-            this.showToast(`❌ Erro na tradução: ${error.message}`, 'error');
-        } finally {
-            this.isTranslating = false;
-            translateButton.innerHTML = originalButtonText;
-            translateButton.disabled = false;
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || 'Erro na API');
         }
-    }
 
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        const data = await response.json();
+        const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!translatedText) {
+            throw new Error('Resposta vazia da IA');
+        }
+
+        return translatedText;
     }
 
     updateStatistics(originalText, translatedText) {
