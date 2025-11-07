@@ -1,15 +1,18 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 2.3.1 - Contador de tempo e relatório de duração da tradução
+// Version: 2.3.2 - Sistema de múltiplas API Keys com rotação automática
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.3.1 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v2.3.2 - by Nardoto');
 
-        this.geminiApiKey = null;
+        // Sistema de múltiplas API Keys
+        this.apiKeys = []; // Array de {key: string, name: string, active: boolean}
+        this.currentKeyIndex = 0;
+
         this.isTranslating = false;
         this.translatedText = '';
         this.originalText = '';
@@ -30,8 +33,8 @@ class ProfessionalTranslator {
     }
 
     init() {
-        // Carregar API Key do localStorage
-        this.geminiApiKey = localStorage.getItem('geminiApiKey');
+        // Carregar API Keys do localStorage
+        this.loadApiKeys();
 
         // Event listeners
         document.getElementById('translateButton').addEventListener('click', () => {
@@ -52,6 +55,7 @@ class ProfessionalTranslator {
 
         document.getElementById('settingsButton').addEventListener('click', () => {
             document.getElementById('settingsModal').style.display = 'block';
+            this.renderApiKeysList(); // Renderizar lista ao abrir modal
         });
 
         document.getElementById('saveApiKeyButton').addEventListener('click', () => {
@@ -95,13 +99,108 @@ class ProfessionalTranslator {
             }
         });
 
-        // Verificar se tem API Key ao carregar
-        if (!this.geminiApiKey) {
+        // Verificar se tem API Keys ao carregar
+        if (this.apiKeys.length === 0) {
             setTimeout(() => {
-                this.showToast('⚠️ Configure sua API Key do Google Gemini primeiro', 'warning');
+                this.showToast('⚠️ Configure pelo menos uma API Key do Google Gemini', 'warning');
                 document.getElementById('settingsModal').style.display = 'block';
             }, 1000);
         }
+    }
+
+    // ========================================
+    // GERENCIAMENTO DE API KEYS
+    // ========================================
+
+    loadApiKeys() {
+        try {
+            const savedKeys = localStorage.getItem('geminiApiKeys');
+            if (savedKeys) {
+                this.apiKeys = JSON.parse(savedKeys);
+                console.log(`✅ ${this.apiKeys.length} API Key(s) carregada(s)`);
+            } else {
+                // Migração: verificar se existe key antiga no formato antigo
+                const oldKey = localStorage.getItem('geminiApiKey');
+                if (oldKey) {
+                    this.apiKeys = [{
+                        key: oldKey,
+                        name: 'API Key Principal',
+                        active: true
+                    }];
+                    this.saveApiKeys();
+                    localStorage.removeItem('geminiApiKey'); // Remover formato antigo
+                    console.log('✅ API Key migrada para novo formato');
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao carregar API Keys:', error);
+            this.apiKeys = [];
+        }
+    }
+
+    saveApiKeys() {
+        try {
+            localStorage.setItem('geminiApiKeys', JSON.stringify(this.apiKeys));
+            console.log(`💾 ${this.apiKeys.length} API Key(s) salva(s)`);
+        } catch (error) {
+            console.error('Erro ao salvar API Keys:', error);
+        }
+    }
+
+    getCurrentApiKey() {
+        if (this.apiKeys.length === 0) return null;
+        return this.apiKeys[this.currentKeyIndex]?.key || null;
+    }
+
+    getCurrentKeyName() {
+        if (this.apiKeys.length === 0) return 'Nenhuma';
+        return this.apiKeys[this.currentKeyIndex]?.name || 'API Key';
+    }
+
+    addApiKey(key, name) {
+        const trimmedKey = key.trim();
+        const trimmedName = name.trim() || `API Key ${this.apiKeys.length + 1}`;
+
+        // Verificar se já existe
+        const exists = this.apiKeys.some(k => k.key === trimmedKey);
+        if (exists) {
+            this.showToast('⚠️ Esta API Key já está cadastrada', 'warning');
+            return false;
+        }
+
+        this.apiKeys.push({
+            key: trimmedKey,
+            name: trimmedName,
+            active: true
+        });
+
+        this.saveApiKeys();
+        return true;
+    }
+
+    removeApiKey(index) {
+        if (index >= 0 && index < this.apiKeys.length) {
+            const removed = this.apiKeys.splice(index, 1);
+
+            // Ajustar índice atual se necessário
+            if (this.currentKeyIndex >= this.apiKeys.length) {
+                this.currentKeyIndex = Math.max(0, this.apiKeys.length - 1);
+            }
+
+            this.saveApiKeys();
+            return removed[0];
+        }
+        return null;
+    }
+
+    rotateToNextKey() {
+        if (this.apiKeys.length <= 1) {
+            return false; // Não há outras keys para tentar
+        }
+
+        this.currentKeyIndex = (this.currentKeyIndex + 1) % this.apiKeys.length;
+        console.log(`🔄 Rotacionando para: ${this.getCurrentKeyName()}`);
+        return true;
     }
 
     updateOriginalLabel(langValue) {
@@ -270,8 +369,8 @@ class ProfessionalTranslator {
             return;
         }
 
-        if (!this.geminiApiKey) {
-            this.showToast('⚠️ Configure sua API Key primeiro', 'error');
+        if (this.apiKeys.length === 0) {
+            this.showToast('⚠️ Configure pelo menos uma API Key primeiro', 'error');
             document.getElementById('settingsModal').style.display = 'block';
             return;
         }
@@ -472,7 +571,7 @@ class ProfessionalTranslator {
     }
 
     /**
-     * Traduz um único chunk
+     * Traduz um único chunk com rotação automática de API Keys
      */
     async translateChunk(chunk, sourceLanguageText, targetLang) {
         const prompt = `Você é um tradutor profissional especializado.
@@ -512,32 +611,72 @@ ${chunk}
 
 TRADUÇÃO PARA ${targetLang.toUpperCase()}:`;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${this.geminiApiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }]
-                })
+        const maxRetries = this.apiKeys.length;
+        let lastError = null;
+
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+            const currentKey = this.getCurrentApiKey();
+
+            if (!currentKey) {
+                throw new Error('Nenhuma API Key disponível');
             }
-        );
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || 'Erro na API');
+            try {
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: prompt }]
+                            }]
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    const errorMessage = error.error?.message || 'Erro na API';
+
+                    // Verificar se é erro 429 (Resource Exhausted)
+                    if (response.status === 429 || errorMessage.includes('Resource exhausted')) {
+                        console.warn(`⚠️ Limite atingido na ${this.getCurrentKeyName()}`);
+
+                        // Tentar rotacionar para próxima key
+                        if (this.rotateToNextKey()) {
+                            this.showToast(`🔄 Limite atingido! Usando: ${this.getCurrentKeyName()}`, 'info');
+                            await this.sleep(1000); // Pausa antes de tentar próxima key
+                            continue; // Tentar com próxima key
+                        } else {
+                            throw new Error('Todas as API Keys atingiram o limite. Aguarde alguns minutos.');
+                        }
+                    }
+
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!translatedText) {
+                    throw new Error('Resposta vazia da IA');
+                }
+
+                return translatedText;
+
+            } catch (error) {
+                lastError = error;
+
+                // Se não for erro de rede/timeout, não tentar outras keys
+                if (!error.message.includes('Resource exhausted') && !error.message.includes('429')) {
+                    throw error;
+                }
+            }
         }
 
-        const data = await response.json();
-        const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!translatedText) {
-            throw new Error('Resposta vazia da IA');
-        }
-
-        return translatedText;
+        // Se chegou aqui, todas as keys falharam
+        throw lastError || new Error('Falha ao traduzir chunk');
     }
 
     updateStatistics(originalText, translatedText) {
@@ -760,26 +899,79 @@ Tradução:
         this.showToast('🗑️ Tudo limpo!', 'info');
     }
 
-    saveApiKey() {
-        const apiKey = document.getElementById('apiKeyInput').value.trim();
+    renderApiKeysList() {
+        const container = document.getElementById('apiKeysList');
+        if (!container) return;
 
-        if (!apiKey) {
+        if (this.apiKeys.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    <p>📝 Nenhuma API Key cadastrada</p>
+                    <p style="font-size: 0.85rem;">Adicione sua primeira chave abaixo</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = this.apiKeys.map((keyData, index) => `
+            <div style="background: ${index === this.currentKeyIndex ? 'linear-gradient(135deg, #667eea11 0%, #764ba211 100%)' : 'var(--bg-hover)'};
+                        border: 2px solid ${index === this.currentKeyIndex ? '#667eea' : 'var(--border-color)'};
+                        border-radius: var(--radius-sm);
+                        padding: 1rem;
+                        margin-bottom: 0.75rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">
+                        ${keyData.name}
+                        ${index === this.currentKeyIndex ? '<span style="background: #667eea; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">EM USO</span>' : ''}
+                    </div>
+                    <div style="font-family: monospace; font-size: 0.8rem; color: var(--text-secondary);">
+                        ${keyData.key.substring(0, 15)}...${keyData.key.substring(keyData.key.length - 10)}
+                    </div>
+                </div>
+                <button onclick="translator.removeApiKeyByIndex(${index})"
+                        style="background: var(--bg-secondary); border: 2px solid var(--border-color); padding: 0.5rem; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-secondary);">
+                    🗑️
+                </button>
+            </div>
+        `).join('');
+    }
+
+    removeApiKeyByIndex(index) {
+        const removed = this.removeApiKey(index);
+        if (removed) {
+            this.renderApiKeysList();
+            this.showToast(`🗑️ ${removed.name} removida`, 'info');
+        }
+    }
+
+    saveApiKey() {
+        const keyInput = document.getElementById('newApiKeyInput');
+        const nameInput = document.getElementById('newApiKeyName');
+
+        const key = keyInput.value.trim();
+        const name = nameInput.value.trim();
+
+        if (!key) {
             this.showToast('⚠️ Digite uma API Key válida', 'warning');
             return;
         }
 
-        localStorage.setItem('geminiApiKey', apiKey);
-        this.geminiApiKey = apiKey;
-
-        document.getElementById('settingsModal').style.display = 'none';
-        this.showToast('✅ API Key salva com sucesso!', 'success');
+        if (this.addApiKey(key, name || `API Key ${this.apiKeys.length + 1}`)) {
+            keyInput.value = '';
+            nameInput.value = '';
+            this.renderApiKeysList();
+            this.showToast('✅ API Key adicionada com sucesso!', 'success');
+        }
     }
 
     async testApiKey() {
-        const apiKey = document.getElementById('apiKeyInput').value.trim() || this.geminiApiKey;
+        const currentKey = this.getCurrentApiKey();
 
-        if (!apiKey) {
-            this.showToast('⚠️ Configure uma API Key primeiro', 'warning');
+        if (!currentKey) {
+            this.showToast('⚠️ Nenhuma API Key configurada', 'warning');
             return;
         }
 
@@ -789,7 +981,7 @@ Tradução:
 
         try {
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -802,7 +994,7 @@ Tradução:
             );
 
             if (response.ok) {
-                this.showToast('✅ API Key válida! Conexão bem-sucedida.', 'success');
+                this.showToast(`✅ ${this.getCurrentKeyName()} está válida!`, 'success');
             } else {
                 const error = await response.json();
                 throw new Error(error.error?.message || 'API Key inválida');
