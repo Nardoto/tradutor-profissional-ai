@@ -355,16 +355,21 @@
 
                 <div style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem;">
                     <p style="color: var(--text); font-size: 0.9rem; margin: 0;">
-                        <strong>Formato CSV:</strong><br>
-                        <code style="background: white; padding: 2px 6px; border-radius: 4px;">email, order_id, order_ref, nome</code><br><br>
-                        <strong>Exemplo:</strong><br>
-                        <code style="background: white; padding: 2px 6px; border-radius: 4px;">cliente@gmail.com, 12345, REF001, João Silva</code>
+                        <strong>📥 Como Exportar do Kiwify:</strong><br>
+                        1. Acesse <strong>Vendas</strong> no Kiwify<br>
+                        2. Clique em <strong>Exportar</strong> (canto superior direito)<br>
+                        3. Baixe o arquivo CSV<br>
+                        4. Abra no Excel/Google Sheets<br>
+                        5. Copie TUDO (incluindo cabeçalho)<br>
+                        6. Cole aqui embaixo ⬇️<br><br>
+
+                        <strong>✅ O sistema detecta automaticamente as colunas!</strong>
                     </p>
                 </div>
 
                 <div class="form-group">
-                    <label>Dados CSV dos Clientes Kiwify</label>
-                    <textarea id="kiwifyImportData" placeholder="cliente1@gmail.com, 12345, REF001, João Silva&#10;cliente2@gmail.com, 12346, REF002, Maria Santos&#10;cliente3@gmail.com, 12347, REF003, Pedro Costa"></textarea>
+                    <label>Cole o CSV Exportado do Kiwify (com cabeçalho)</label>
+                    <textarea id="kiwifyImportData" placeholder="Status,Product Name,Payment Method,Plan Name,Customer Name,Customer Email...&#10;active,CLUBE ASSINATURA,credit_card,PLANO VIP,João Silva,joao@gmail.com..."></textarea>
                 </div>
                 <button onclick="importKiwifyCustomers()" class="btn btn-success">
                     🔗 Importar e Vincular com Kiwify
@@ -431,7 +436,7 @@
 
         // Carregar admin.js depois que Firebase estiver pronto
         const script = document.createElement('script');
-        script.src = 'admin.js?v=6.0.0'; // Versão 6.0.0 - Importação Kiwify com vínculo
+        script.src = 'admin.js?v=6.1.0'; // Versão 6.1.0 - Suporte CSV nativo do Kiwify
         document.body.appendChild(script);
     </script>
 </body>

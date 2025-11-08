@@ -1,7 +1,7 @@
 // ========================================
 // PAINEL DE ADMINISTRAÇÃO
 // Admin Panel for Managing PRO Users
-// Version: 6.0.0 - Importação Kiwify com Vínculo
+// Version: 6.1.0 - Suporte CSV Nativo do Kiwify
 // Desenvolvido por: Nardoto
 // ========================================
 
@@ -301,42 +301,75 @@ async function importKiwifyCustomers() {
         return;
     }
 
-    // Processar CSV
+    // Processar CSV do Kiwify
     const lines = csvData.split('\n').map(line => line.trim()).filter(line => line);
+
+    if (lines.length < 2) {
+        showToast('⚠️ CSV inválido! Cole o cabeçalho e os dados.', 'warning');
+        return;
+    }
+
+    // Primeira linha é o cabeçalho
+    const header = lines[0].split(',').map(h => h.trim());
+
+    // Encontrar índices das colunas importantes
+    const emailIndex = header.findIndex(h => h.toLowerCase().includes('email'));
+    const nameIndex = header.findIndex(h => h.toLowerCase().includes('customer name'));
+    const statusIndex = header.findIndex(h => h.toLowerCase().includes('status'));
+    const startedAtIndex = header.findIndex(h => h.toLowerCase().includes('started at'));
+
+    if (emailIndex === -1) {
+        showToast('❌ Coluna "Customer Email" não encontrada no CSV!', 'error');
+        return;
+    }
+
+    console.log('📊 Colunas detectadas:', { emailIndex, nameIndex, statusIndex, startedAtIndex });
+
     const customers = [];
 
-    for (const line of lines) {
-        // Separar por vírgula
+    // Processar cada linha (pular cabeçalho)
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
         const parts = line.split(',').map(p => p.trim());
 
-        if (parts.length < 3) {
-            console.warn('⚠️ Linha inválida (mínimo 3 campos):', line);
-            continue;
-        }
-
-        const [email, orderId, orderRef, name = ''] = parts;
+        // Pegar valores das colunas
+        const email = parts[emailIndex];
+        const name = nameIndex !== -1 ? parts[nameIndex] : '';
+        const status = statusIndex !== -1 ? parts[statusIndex] : 'active';
+        const startedAt = startedAtIndex !== -1 ? parts[startedAtIndex] : '';
 
         // Validar email
         if (!email || !email.includes('@')) {
-            console.warn('⚠️ Email inválido:', email);
+            console.warn('⚠️ Linha inválida - email não encontrado:', line);
             continue;
         }
+
+        // Filtrar apenas assinaturas ativas
+        if (status.toLowerCase() !== 'active') {
+            console.log(`⏸️ Ignorando ${email} - Status: ${status}`);
+            continue;
+        }
+
+        // Gerar order_id e order_ref automáticos
+        const timestamp = startedAt ? new Date(startedAt).getTime() : Date.now();
+        const orderId = `KW${timestamp}`;
+        const orderRef = `IMPORT-${timestamp}`;
 
         customers.push({
             email: email.toLowerCase(),
             orderId: orderId,
             orderRef: orderRef,
-            name: name
+            name: name || 'Cliente Kiwify'
         });
     }
 
     if (customers.length === 0) {
-        showToast('⚠️ Nenhum cliente válido encontrado no CSV!', 'warning');
+        showToast('⚠️ Nenhum cliente ativo encontrado no CSV!', 'warning');
         return;
     }
 
     // Confirmar importação
-    const message = `Importar e vincular ${customers.length} clientes ao Kiwify?\n\nPrimeiros 5:\n${customers.slice(0, 5).map(c => `${c.email} (${c.orderId})`).join('\n')}${customers.length > 5 ? '\n...' : ''}`;
+    const message = `Importar e vincular ${customers.length} clientes ATIVOS ao Kiwify?\n\nPrimeiros 5:\n${customers.slice(0, 5).map(c => `${c.name} <${c.email}>`).join('\n')}${customers.length > 5 ? '\n...' : ''}`;
 
     if (!confirm(message)) {
         return;
@@ -489,4 +522,4 @@ function showToast(message, type = 'info') {
     }, 4000);
 }
 
-console.log('⚙️ Admin Panel v6.0.0 - Importação Kiwify - by Nardoto');
+console.log('⚙️ Admin Panel v6.1.0 - CSV Nativo Kiwify - by Nardoto');
