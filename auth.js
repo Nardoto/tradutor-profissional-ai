@@ -12,7 +12,7 @@ class AuthManager {
         this.currentUser = null;
         this.userStats = {
             translationsToday: 0,
-            translationsLimit: 10,
+            translationsLimit: 50,
             isPro: false,
             lastReset: new Date().toDateString()
         };
@@ -171,7 +171,7 @@ class AuthManager {
                 }
 
                 this.userStats.isPro = data.isPro || false;
-                this.userStats.translationsLimit = data.isPro ? 999999 : 10;
+                this.userStats.translationsLimit = data.isPro ? 999999 : 50;
 
                 this.updateUserStatsUI();
             }
@@ -282,7 +282,7 @@ class AuthManager {
                     <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
                     <h2 style="color: var(--accent-primary); margin-bottom: 1rem;">Limite Diário Atingido</h2>
                     <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                        Você usou todas as <strong>10 traduções gratuitas</strong> de hoje.
+                        Você usou todas as <strong>50 traduções gratuitas</strong> de hoje.
                         Volte amanhã ou faça upgrade para o Plano PRO!
                     </p>
                     <div style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 2rem;">
