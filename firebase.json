@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "source": "functions",
+    "predeploy": [],
+    "runtime": "nodejs20"
+  }
+}

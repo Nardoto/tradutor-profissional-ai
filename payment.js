@@ -9,8 +9,8 @@ class PaymentManager {
     constructor() {
         console.log('💳 PaymentManager v1.0.0 - Kiwify Integration');
 
-        // URL do produto Kiwify (VOCÊ VAI SUBSTITUIR PELA URL REAL)
-        this.kiwifyCheckoutUrl = 'https://pay.kiwify.com.br/SEU_PRODUTO_ID';
+        // URL do produto Kiwify - PLANO BASICO
+        this.kiwifyCheckoutUrl = 'https://pay.kiwify.com.br/NtnupLV';
 
         this.init();
     }
