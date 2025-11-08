@@ -1,13 +1,13 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 2.3.2 - Sistema de múltiplas API Keys com rotação automática
+// Version: 3.0.0 - Sistema de Autenticação Firebase + Controle de Uso
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v2.3.2 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v3.0.0 - by Nardoto');
 
         // Sistema de múltiplas API Keys
         this.apiKeys = []; // Array de {key: string, name: string, active: boolean}
@@ -349,6 +349,11 @@ class ProfessionalTranslator {
     async translate() {
         if (this.isTranslating) return;
 
+        // 🔐 VERIFICAÇÃO DE AUTENTICAÇÃO E LIMITES
+        if (window.authManager && !window.authManager.canTranslate()) {
+            return;
+        }
+
         const originalText = document.getElementById('originalText').value.trim();
         const sourceLangSelector = document.getElementById('sourceLangSelector');
         const targetLangSelector = document.getElementById('targetLangSelector');
@@ -498,6 +503,11 @@ class ProfessionalTranslator {
                 this.showToast(`✅ Tradução concluída! ${this.totalChunks} partes processadas em ${timeFormatted}`, 'success');
             } else {
                 this.showToast(`✅ Tradução concluída em ${timeFormatted}!`, 'success');
+            }
+
+            // 📊 Incrementar contador de traduções do usuário
+            if (window.authManager) {
+                await window.authManager.incrementTranslationCount();
             }
 
         } catch (error) {
