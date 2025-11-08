@@ -294,7 +294,7 @@ class AuthManager {
                             <li><strong>Sem anúncios</strong> (futuro)</li>
                         </ul>
                     </div>
-                    <button onclick="document.getElementById('limitModal').remove()" class="btn-primary" style="width: 100%; padding: 1rem; margin-bottom: 0.5rem;">
+                    <button onclick="window.paymentManager.startCheckout(); document.getElementById('limitModal').remove();" class="btn-primary btn-upgrade-pro" style="width: 100%; padding: 1rem; margin-bottom: 0.5rem;">
                         ⭐ Fazer Upgrade Agora
                     </button>
                     <button onclick="document.getElementById('limitModal').remove()" class="btn-secondary" style="width: 100%; padding: 1rem;">
@@ -307,7 +307,12 @@ class AuthManager {
     }
 
     showUpgradeModal() {
-        this.showToast('💡 Sistema de pagamento em breve! Por enquanto, aproveite o plano gratuito.', 'info');
+        // Iniciar checkout do Kiwify
+        if (window.paymentManager) {
+            window.paymentManager.startCheckout();
+        } else {
+            this.showToast('⚠️ Sistema de pagamento carregando... Tente novamente em instantes.', 'warning');
+        }
 
         // Fechar menu
         const menu = document.getElementById('userDropdownMenu');
