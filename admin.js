@@ -18,28 +18,39 @@ const ADMIN_EMAILS = [
 // AUTENTICAÇÃO
 // ========================================
 
-// Verificar resultado do redirect (quando volta do Google)
-window.firebaseGetRedirectResult(window.firebaseAuth).then((result) => {
-    if (result && result.user) {
-        console.log('Login via redirect bem-sucedido');
+// Verificar resultado do redirect apenas UMA vez quando a página carrega
+(async function checkRedirect() {
+    try {
+        const result = await window.firebaseGetRedirectResult(window.firebaseAuth);
+        if (result && result.user) {
+            console.log('✅ Login via redirect bem-sucedido:', result.user.email);
+        }
+    } catch (error) {
+        console.error('Erro no redirect:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+            showToast('❌ Erro no login. Tente novamente.', 'error');
+        }
     }
-}).catch((error) => {
-    console.error('Erro no redirect:', error);
-    showToast('❌ Erro no login. Tente novamente.', 'error');
-});
+})();
 
+// Monitorar estado de autenticação
 window.firebaseOnAuthStateChanged(window.firebaseAuth, (user) => {
+    console.log('Auth state changed:', user ? user.email : 'não logado');
+
     if (user) {
         // Verificar se é admin (pode ser qualquer email da lista)
         if (ADMIN_EMAILS.includes(user.email)) {
+            console.log('✅ Admin autorizado:', user.email);
             currentUser = user;
             showAdminPanel();
             loadUsers();
         } else {
+            console.log('❌ Email não autorizado:', user.email);
             showToast('❌ Acesso negado! Apenas administradores podem acessar.', 'error');
-            logout();
+            setTimeout(() => logout(), 2000);
         }
     } else {
+        console.log('Nenhum usuário logado - mostrando tela de login');
         showLoginScreen();
     }
 });
