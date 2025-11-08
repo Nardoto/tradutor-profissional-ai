@@ -325,36 +325,21 @@
                 </div>
             </div>
 
-            <!-- Importação Kiwify COM Vínculo -->
+            <!-- Teste Grátis 3 Dias -->
             <div class="panel">
-                <h2>📦 Importar Clientes do Kiwify (COM Vínculo)</h2>
+                <h2>🎁 Ativação Teste Grátis (3 Dias)</h2>
                 <p style="color: var(--text-light); margin-bottom: 0.5rem;">
-                    ✅ <strong>Esta opção VINCULA com Kiwify.</strong> Renovações e cancelamentos funcionarão automaticamente.
+                    ⚡ <strong>Teste grátis sem vínculo Kiwify.</strong> Expira automaticamente após 3 dias.
                 </p>
                 <p style="color: var(--text-light); margin-bottom: 1rem;">
-                    Cole os dados em formato CSV (uma linha por cliente):
+                    Cole a lista de emails (um por linha) para dar 3 dias de teste PRO:
                 </p>
-
-                <div style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem;">
-                    <p style="color: var(--text); font-size: 0.9rem; margin: 0;">
-                        <strong>📥 Como Exportar do Kiwify:</strong><br>
-                        1. Acesse <strong>Vendas</strong> no Kiwify<br>
-                        2. Clique em <strong>Exportar</strong> (canto superior direito)<br>
-                        3. Baixe o arquivo CSV<br>
-                        4. Abra no Excel/Google Sheets<br>
-                        5. Copie TUDO (incluindo cabeçalho)<br>
-                        6. Cole aqui embaixo ⬇️<br><br>
-
-                        <strong>✅ O sistema detecta automaticamente as colunas!</strong>
-                    </p>
-                </div>
-
                 <div class="form-group">
-                    <label>Cole o CSV Exportado do Kiwify (com cabeçalho)</label>
-                    <textarea id="kiwifyImportData" placeholder="Status,Product Name,Payment Method,Plan Name,Customer Name,Customer Email...&#10;active,CLUBE ASSINATURA,credit_card,PLANO VIP,João Silva,joao@gmail.com..."></textarea>
+                    <label>Lista de Emails para Teste</label>
+                    <textarea id="trialEmailList" placeholder="email1@gmail.com&#10;email2@gmail.com&#10;email3@gmail.com"></textarea>
                 </div>
-                <button onclick="importKiwifyCustomers()" class="btn btn-success">
-                    🔗 Importar e Vincular com Kiwify
+                <button onclick="activateTrials()" class="btn btn-success">
+                    🎁 Ativar Teste Grátis (3 Dias)
                 </button>
             </div>
 
@@ -418,7 +403,7 @@
 
         // Carregar admin.js depois que Firebase estiver pronto
         const script = document.createElement('script');
-        script.src = 'admin.js?v=6.1.0'; // Versão 6.1.0 - Suporte CSV nativo do Kiwify
+        script.src = 'admin.js?v=6.2.0'; // Versão 6.2.0 - Teste grátis 3 dias
         document.body.appendChild(script);
     </script>
 </body>

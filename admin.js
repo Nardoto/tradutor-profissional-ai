@@ -1,7 +1,7 @@
 // ========================================
 // PAINEL DE ADMINISTRAÇÃO
 // Admin Panel for Managing PRO Users
-// Version: 6.1.0 - Suporte CSV Nativo do Kiwify
+// Version: 6.2.0 - Teste Grátis 3 Dias
 // Desenvolvido por: Nardoto
 // ========================================
 
@@ -143,29 +143,58 @@ function renderUsers(users) {
         return;
     }
 
-    userList.innerHTML = users.map(user => `
-        <div class="user-item" data-email="${user.email}">
-            <div class="user-info">
-                <div class="user-email">
-                    ${user.email}
-                    <span class="badge ${user.isPro ? 'badge-pro' : 'badge-free'}">
-                        ${user.isPro ? 'PRO' : 'GRÁTIS'}
-                    </span>
+    userList.innerHTML = users.map(user => {
+        // Verificar se é teste grátis
+        const isTrial = user.isPro && user.proActivatedBy === 'trial';
+        const trialExpired = isTrial && user.trialExpiresAt && new Date(user.trialExpiresAt) < new Date();
+
+        // Calcular dias restantes do teste
+        let trialDaysLeft = 0;
+        if (isTrial && user.trialExpiresAt) {
+            const expiresAt = new Date(user.trialExpiresAt);
+            const now = new Date();
+            trialDaysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+        }
+
+        // Badge do status
+        let badgeClass = 'badge-free';
+        let badgeText = 'GRÁTIS';
+
+        if (user.isPro) {
+            if (isTrial) {
+                badgeClass = 'badge-free'; // Laranja para teste
+                badgeText = trialExpired ? 'TESTE EXPIRADO' : `TESTE (${trialDaysLeft}d)`;
+            } else {
+                badgeClass = 'badge-pro';
+                badgeText = 'PRO';
+            }
+        }
+
+        return `
+            <div class="user-item" data-email="${user.email}">
+                <div class="user-info">
+                    <div class="user-email">
+                        ${user.email}
+                        <span class="badge ${badgeClass}">
+                            ${badgeText}
+                        </span>
+                    </div>
+                    <div class="user-status">
+                        ${user.displayName || 'Sem nome'} •
+                        ${user.translationsToday || 0} traduções hoje •
+                        Criado em ${formatDate(user.createdAt)}
+                        ${isTrial && !trialExpired ? ` • Teste expira em ${new Date(user.trialExpiresAt).toLocaleDateString('pt-BR')}` : ''}
+                    </div>
                 </div>
-                <div class="user-status">
-                    ${user.displayName || 'Sem nome'} •
-                    ${user.translationsToday || 0} traduções hoje •
-                    Criado em ${formatDate(user.createdAt)}
+                <div class="user-actions">
+                    ${user.isPro ?
+                        `<button onclick="togglePro('${user.id}', '${user.email}', false)" class="btn btn-danger btn-sm">Desativar PRO</button>` :
+                        `<button onclick="togglePro('${user.id}', '${user.email}', true)" class="btn btn-success btn-sm">Ativar PRO</button>`
+                    }
                 </div>
             </div>
-            <div class="user-actions">
-                ${user.isPro ?
-                    `<button onclick="togglePro('${user.id}', '${user.email}', false)" class="btn btn-danger btn-sm">Desativar PRO</button>` :
-                    `<button onclick="togglePro('${user.id}', '${user.email}', true)" class="btn btn-success btn-sm">Ativar PRO</button>`
-                }
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function formatDate(dateString) {
@@ -481,6 +510,138 @@ async function importKiwifyCustomers() {
 window.importKiwifyCustomers = importKiwifyCustomers;
 
 // ========================================
+// ATIVAÇÃO TESTE GRÁTIS (3 DIAS)
+// ========================================
+
+async function activateTrials() {
+    const emailList = document.getElementById('trialEmailList').value;
+
+    if (!emailList.trim()) {
+        showToast('⚠️ Cole a lista de emails primeiro!', 'warning');
+        return;
+    }
+
+    // Separar emails por linha e limpar espaços
+    const emails = emailList
+        .split('\n')
+        .map(e => e.trim().toLowerCase())
+        .filter(e => e && e.includes('@'));
+
+    if (emails.length === 0) {
+        showToast('⚠️ Nenhum email válido encontrado!', 'warning');
+        return;
+    }
+
+    if (!confirm(`🎁 Ativar teste grátis de 3 dias para ${emails.length} usuários?\n\n${emails.slice(0, 5).join('\n')}${emails.length > 5 ? '\n...' : ''}`)) {
+        return;
+    }
+
+    let activated = 0;
+    let pending = 0;
+    let updated = 0;
+
+    showToast(`⏳ Ativando teste grátis para ${emails.length} usuários...`, 'info');
+
+    try {
+        // Buscar todos os usuários
+        const usersRef = window.firebaseCollection(window.firebaseDb, 'users');
+        const snapshot = await window.firebaseGetDocs(usersRef);
+
+        const userMap = new Map();
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            userMap.set(data.email.toLowerCase(), { id: doc.id, ...data });
+        });
+
+        // Calcular data de expiração (3 dias a partir de agora)
+        const trialDuration = 3 * 24 * 60 * 60 * 1000; // 3 dias em milissegundos
+        const trialExpiresAt = new Date(Date.now() + trialDuration).toISOString();
+
+        // Ativar teste para cada email
+        for (const email of emails) {
+            const user = userMap.get(email);
+
+            if (user) {
+                const userRef = window.firebaseDoc(window.firebaseDb, 'users', user.id);
+
+                // Se usuário já é PRO pago (kiwify), não sobrescrever
+                if (user.isPro && user.proActivatedBy === 'kiwify') {
+                    console.log(`⏭️ Pulando ${email} - Já é PRO pago (Kiwify)`);
+                    updated++;
+                    continue;
+                }
+
+                await window.firebaseUpdateDoc(userRef, {
+                    isPro: true,
+                    proActivatedBy: 'trial',
+                    proActivatedAt: new Date().toISOString(),
+                    trialExpiresAt: trialExpiresAt
+                });
+
+                activated++;
+                console.log(`🎁 Teste ativado para ${email} até ${new Date(trialExpiresAt).toLocaleString('pt-BR')}`);
+
+            } else {
+                // Usuário não existe - criar ativação pendente
+                const pendingRef = window.firebaseCollection(window.firebaseDb, 'pending_activations');
+
+                // Verificar se já existe ativação pendente
+                const pendingQuery = window.firebaseQuery(
+                    pendingRef,
+                    window.firebaseWhere('email', '==', email)
+                );
+                const pendingSnap = await window.firebaseGetDocs(pendingQuery);
+
+                if (pendingSnap.empty) {
+                    // Adicionar nova ativação pendente
+                    await window.firebaseAddDoc(pendingRef, {
+                        email: email,
+                        orderId: `TRIAL-${Date.now()}`,
+                        orderRef: `TRIAL-${Date.now()}`,
+                        trialExpiresAt: trialExpiresAt,
+                        createdAt: new Date().toISOString(),
+                        status: 'pending',
+                        source: 'trial'
+                    });
+                }
+
+                pending++;
+                console.log(`⚠️ Teste pendente criado para ${email} (aguardando primeiro login)`);
+            }
+        }
+
+        // Mensagem final
+        let resultMessage = `✅ Teste grátis (3 dias) ativado!\n\n`;
+
+        if (activated > 0) {
+            resultMessage += `🎁 ${activated} usuários com teste ativo até ${new Date(trialExpiresAt).toLocaleDateString('pt-BR')}\n`;
+        }
+
+        if (pending > 0) {
+            resultMessage += `⚠️ ${pending} testes pendentes (aguardando login)\n`;
+        }
+
+        if (updated > 0) {
+            resultMessage += `⏭️ ${updated} usuários já PRO pagos (não alterados)`;
+        }
+
+        showToast(resultMessage, 'success');
+
+        // Recarregar lista
+        await loadUsers();
+
+        // Limpar textarea
+        document.getElementById('trialEmailList').value = '';
+
+    } catch (error) {
+        console.error('❌ Erro na ativação de testes:', error);
+        showToast('❌ Erro ao ativar testes: ' + error.message, 'error');
+    }
+}
+
+window.activateTrials = activateTrials;
+
+// ========================================
 // FILTRO DE BUSCA
 // ========================================
 
@@ -522,4 +683,4 @@ function showToast(message, type = 'info') {
     }, 4000);
 }
 
-console.log('⚙️ Admin Panel v6.1.0 - CSV Nativo Kiwify - by Nardoto');
+console.log('⚙️ Admin Panel v6.2.0 - Teste Grátis 3 Dias - by Nardoto');

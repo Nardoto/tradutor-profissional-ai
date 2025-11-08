@@ -1,13 +1,13 @@
 // ========================================
 // SISTEMA DE AUTENTICAÇÃO FIREBASE
 // Firebase Authentication Manager
-// Version: 3.1.0
+// Version: 3.2.0 - Trial Support
 // Desenvolvido por: Nardoto
 // ========================================
 
 class AuthManager {
     constructor() {
-        console.log('🔐 AuthManager v3.1.0 - by Nardoto');
+        console.log('🔐 AuthManager v3.2.0 - Trial Support - by Nardoto');
 
         this.currentUser = null;
         this.userStats = {
@@ -170,13 +170,39 @@ class AuthManager {
                     this.userStats.translationsToday = data.translationsToday || 0;
                 }
 
-                this.userStats.isPro = data.isPro || false;
-                this.userStats.translationsLimit = data.isPro ? 999999 : 50;
+                // Verificar expiração de teste grátis
+                if (data.isPro && data.proActivatedBy === 'trial' && data.trialExpiresAt) {
+                    const expiresAt = new Date(data.trialExpiresAt);
+                    const now = new Date();
+
+                    if (now > expiresAt) {
+                        // Teste expirado - downgrade para FREE
+                        console.log('⏰ Teste grátis expirado - fazendo downgrade...');
+                        await window.firebaseUpdateDoc(userRef, {
+                            isPro: false,
+                            proActivatedBy: null,
+                            proActivatedAt: null,
+                            trialExpiresAt: null
+                        });
+
+                        this.userStats.isPro = false;
+                        this.showToast('⏰ Seu teste grátis de 3 dias expirou. Faça upgrade para continuar com o PRO!', 'warning');
+                    } else {
+                        // Teste ainda válido
+                        this.userStats.isPro = true;
+                        const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                        console.log(`🎁 Teste grátis ativo - ${daysLeft} dias restantes`);
+                    }
+                } else {
+                    this.userStats.isPro = data.isPro || false;
+                }
+
+                this.userStats.translationsLimit = this.userStats.isPro ? 999999 : 50;
 
                 this.updateUserStatsUI();
 
                 // Verificar ativações pendentes (caso tenha pago antes de fazer login)
-                if (!data.isPro) {
+                if (!this.userStats.isPro) {
                     await this.checkPendingActivations();
                 }
             }
