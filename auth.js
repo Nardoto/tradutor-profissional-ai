@@ -1,13 +1,13 @@
 // ========================================
 // SISTEMA DE AUTENTICAÇÃO FIREBASE
 // Firebase Authentication Manager
-// Version: 3.0.0
+// Version: 3.1.0
 // Desenvolvido por: Nardoto
 // ========================================
 
 class AuthManager {
     constructor() {
-        console.log('🔐 AuthManager v3.0.0 - by Nardoto');
+        console.log('🔐 AuthManager v3.1.0 - by Nardoto');
 
         this.currentUser = null;
         this.userStats = {
@@ -174,9 +174,37 @@ class AuthManager {
                 this.userStats.translationsLimit = data.isPro ? 999999 : 50;
 
                 this.updateUserStatsUI();
+
+                // Verificar ativações pendentes (caso tenha pago antes de fazer login)
+                if (!data.isPro) {
+                    await this.checkPendingActivations();
+                }
             }
         } catch (error) {
             console.error('❌ Erro ao carregar stats:', error);
+        }
+    }
+
+    async checkPendingActivations() {
+        try {
+            if (!window.firebaseFunctions) {
+                console.log('⚠️ Firebase Functions não está disponível');
+                return;
+            }
+
+            console.log('🔍 Verificando ativações pendentes...');
+
+            const checkPendingActivations = window.firebaseFunctions.httpsCallable('checkPendingActivations');
+            const result = await checkPendingActivations();
+
+            if (result.data.activated) {
+                console.log('✅ Ativação pendente processada!');
+                this.showToast('🎉 Seu Plano PRO foi ativado!', 'success');
+                // Recarregar stats para atualizar isPro
+                await this.loadUserStats();
+            }
+        } catch (error) {
+            console.error('❌ Erro ao verificar ativações pendentes:', error);
         }
     }
 
