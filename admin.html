@@ -365,7 +365,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -385,8 +385,7 @@
         window.firebaseAuth = auth;
         window.firebaseDb = db;
         window.firebaseProvider = provider;
-        window.firebaseSignInWithRedirect = signInWithRedirect;
-        window.firebaseGetRedirectResult = getRedirectResult;
+        window.firebaseSignInWithPopup = signInWithPopup;
         window.firebaseOnAuthStateChanged = onAuthStateChanged;
         window.firebaseSignOut = signOut;
         window.firebaseCollection = collection;
@@ -400,7 +399,7 @@
 
         // Carregar admin.js depois que Firebase estiver pronto
         const script = document.createElement('script');
-        script.src = 'admin.js?v=4.0.0'; // Versão 4.0.0 - Corrigir loop de redirect
+        script.src = 'admin.js?v=5.0.0'; // Versão 5.0.0 - Voltar para popup (mais confiável)
         document.body.appendChild(script);
     </script>
 </body>

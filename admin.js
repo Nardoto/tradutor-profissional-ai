@@ -18,21 +18,6 @@ const ADMIN_EMAILS = [
 // AUTENTICAÇÃO
 // ========================================
 
-// Verificar resultado do redirect apenas UMA vez quando a página carrega
-(async function checkRedirect() {
-    try {
-        const result = await window.firebaseGetRedirectResult(window.firebaseAuth);
-        if (result && result.user) {
-            console.log('✅ Login via redirect bem-sucedido:', result.user.email);
-        }
-    } catch (error) {
-        console.error('Erro no redirect:', error);
-        if (error.code !== 'auth/popup-closed-by-user') {
-            showToast('❌ Erro no login. Tente novamente.', 'error');
-        }
-    }
-})();
-
 // Monitorar estado de autenticação
 window.firebaseOnAuthStateChanged(window.firebaseAuth, (user) => {
     console.log('Auth state changed:', user ? user.email : 'não logado');
@@ -65,13 +50,21 @@ function showAdminPanel() {
     document.getElementById('adminPanel').style.display = 'block';
 }
 
-function loginWithGoogle() {
+async function loginWithGoogle() {
     try {
-        // Usar redirect ao invés de popup (funciona melhor com CORS)
-        window.firebaseSignInWithRedirect(window.firebaseAuth, window.firebaseProvider);
+        console.log('Iniciando login com popup...');
+        const result = await window.firebaseSignInWithPopup(window.firebaseAuth, window.firebaseProvider);
+        console.log('✅ Login bem-sucedido:', result.user.email);
     } catch (error) {
         console.error('Erro no login:', error);
-        showToast('❌ Erro ao fazer login', 'error');
+
+        if (error.code === 'auth/popup-closed-by-user') {
+            showToast('⚠️ Login cancelado', 'warning');
+        } else if (error.code === 'auth/popup-blocked') {
+            showToast('⚠️ Popup bloqueado! Permita popups para este site.', 'warning');
+        } else {
+            showToast('❌ Erro ao fazer login: ' + error.message, 'error');
+        }
     }
 }
 
