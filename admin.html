@@ -325,18 +325,49 @@
                 </div>
             </div>
 
-            <!-- Ativação em Massa -->
+            <!-- Ativação em Massa (SEM vínculo) -->
             <div class="panel">
-                <h2>📋 Ativação em Massa</h2>
+                <h2>📋 Ativação em Massa (Temporária)</h2>
+                <p style="color: var(--text-light); margin-bottom: 0.5rem;">
+                    ⚠️ <strong>Esta opção NÃO vincula com Kiwify.</strong> Use apenas temporariamente.
+                </p>
                 <p style="color: var(--text-light); margin-bottom: 1rem;">
-                    Cole a lista de emails (um por linha) dos clientes que devem ter acesso PRO:
+                    Cole a lista de emails (um por linha):
                 </p>
                 <div class="form-group">
                     <label>Lista de Emails</label>
                     <textarea id="emailList" placeholder="email1@gmail.com&#10;email2@gmail.com&#10;email3@gmail.com"></textarea>
                 </div>
                 <button onclick="activateMultiple()" class="btn btn-success">
-                    ✅ Ativar PRO para Todos
+                    ✅ Ativar PRO (Sem Vínculo)
+                </button>
+            </div>
+
+            <!-- Importação Kiwify COM Vínculo -->
+            <div class="panel">
+                <h2>📦 Importar Clientes do Kiwify (COM Vínculo)</h2>
+                <p style="color: var(--text-light); margin-bottom: 0.5rem;">
+                    ✅ <strong>Esta opção VINCULA com Kiwify.</strong> Renovações e cancelamentos funcionarão automaticamente.
+                </p>
+                <p style="color: var(--text-light); margin-bottom: 1rem;">
+                    Cole os dados em formato CSV (uma linha por cliente):
+                </p>
+
+                <div style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem;">
+                    <p style="color: var(--text); font-size: 0.9rem; margin: 0;">
+                        <strong>Formato CSV:</strong><br>
+                        <code style="background: white; padding: 2px 6px; border-radius: 4px;">email, order_id, order_ref, nome</code><br><br>
+                        <strong>Exemplo:</strong><br>
+                        <code style="background: white; padding: 2px 6px; border-radius: 4px;">cliente@gmail.com, 12345, REF001, João Silva</code>
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label>Dados CSV dos Clientes Kiwify</label>
+                    <textarea id="kiwifyImportData" placeholder="cliente1@gmail.com, 12345, REF001, João Silva&#10;cliente2@gmail.com, 12346, REF002, Maria Santos&#10;cliente3@gmail.com, 12347, REF003, Pedro Costa"></textarea>
+                </div>
+                <button onclick="importKiwifyCustomers()" class="btn btn-success">
+                    🔗 Importar e Vincular com Kiwify
                 </button>
             </div>
 
@@ -366,7 +397,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, getDocs, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBQPGu8l-JQqjHRubcAcYeUK7aIgH7vPIE",
@@ -392,6 +423,7 @@
         window.firebaseGetDocs = getDocs;
         window.firebaseDoc = doc;
         window.firebaseUpdateDoc = updateDoc;
+        window.firebaseAddDoc = addDoc;
         window.firebaseQuery = query;
         window.firebaseWhere = where;
 
@@ -399,7 +431,7 @@
 
         // Carregar admin.js depois que Firebase estiver pronto
         const script = document.createElement('script');
-        script.src = 'admin.js?v=5.0.0'; // Versão 5.0.0 - Voltar para popup (mais confiável)
+        script.src = 'admin.js?v=6.0.0'; // Versão 6.0.0 - Importação Kiwify com vínculo
         document.body.appendChild(script);
     </script>
 </body>

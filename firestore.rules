@@ -18,23 +18,24 @@ service cloud.firestore {
                     && request.auth.uid == userId
                     && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPro', 'proActivatedAt', 'proActivatedBy']);
 
-      // Admins podem ler todos os usuários
-      allow read: if request.auth != null
+      // Admins podem ler e escrever em todos os usuários
+      allow read, write: if request.auth != null
                   && request.auth.token.email in [
                     'tharcisionardoto@gmail.com',
                     'nardotoengenharia@gmail.com'
                   ];
-
-      // Apenas Cloud Functions podem modificar campos PRO
-      allow write: if false;
     }
 
     // ========================================
     // PENDING ACTIVATIONS COLLECTION
     // ========================================
     match /pending_activations/{docId} {
-      // Apenas Cloud Functions podem gerenciar ativações pendentes
-      allow read, write: if false;
+      // Admins podem ler e escrever ativações pendentes
+      allow read, write: if request.auth != null
+                  && request.auth.token.email in [
+                    'tharcisionardoto@gmail.com',
+                    'nardotoengenharia@gmail.com'
+                  ];
     }
 
     // ========================================

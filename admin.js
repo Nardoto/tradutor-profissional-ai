@@ -1,7 +1,7 @@
 // ========================================
 // PAINEL DE ADMINISTRAÇÃO
 // Admin Panel for Managing PRO Users
-// Version: 1.0.0
+// Version: 6.0.0 - Importação Kiwify com Vínculo
 // Desenvolvido por: Nardoto
 // ========================================
 
@@ -290,6 +290,164 @@ async function activateMultiple() {
 window.activateMultiple = activateMultiple;
 
 // ========================================
+// IMPORTAÇÃO KIWIFY COM VÍNCULO
+// ========================================
+
+async function importKiwifyCustomers() {
+    const csvData = document.getElementById('kiwifyImportData').value;
+
+    if (!csvData.trim()) {
+        showToast('⚠️ Cole os dados CSV primeiro!', 'warning');
+        return;
+    }
+
+    // Processar CSV
+    const lines = csvData.split('\n').map(line => line.trim()).filter(line => line);
+    const customers = [];
+
+    for (const line of lines) {
+        // Separar por vírgula
+        const parts = line.split(',').map(p => p.trim());
+
+        if (parts.length < 3) {
+            console.warn('⚠️ Linha inválida (mínimo 3 campos):', line);
+            continue;
+        }
+
+        const [email, orderId, orderRef, name = ''] = parts;
+
+        // Validar email
+        if (!email || !email.includes('@')) {
+            console.warn('⚠️ Email inválido:', email);
+            continue;
+        }
+
+        customers.push({
+            email: email.toLowerCase(),
+            orderId: orderId,
+            orderRef: orderRef,
+            name: name
+        });
+    }
+
+    if (customers.length === 0) {
+        showToast('⚠️ Nenhum cliente válido encontrado no CSV!', 'warning');
+        return;
+    }
+
+    // Confirmar importação
+    const message = `Importar e vincular ${customers.length} clientes ao Kiwify?\n\nPrimeiros 5:\n${customers.slice(0, 5).map(c => `${c.email} (${c.orderId})`).join('\n')}${customers.length > 5 ? '\n...' : ''}`;
+
+    if (!confirm(message)) {
+        return;
+    }
+
+    let imported = 0;
+    let notFound = 0;
+    let updated = 0;
+
+    showToast(`⏳ Importando ${customers.length} clientes...`, 'info');
+
+    try {
+        // Buscar todos os usuários
+        const usersRef = window.firebaseCollection(window.firebaseDb, 'users');
+        const snapshot = await window.firebaseGetDocs(usersRef);
+
+        const userMap = new Map();
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            userMap.set(data.email.toLowerCase(), { id: doc.id, ...data });
+        });
+
+        // Importar cada cliente
+        for (const customer of customers) {
+            const user = userMap.get(customer.email);
+
+            if (user) {
+                // Usuário existe - atualizar com vínculo Kiwify
+                const userRef = window.firebaseDoc(window.firebaseDb, 'users', user.id);
+
+                await window.firebaseUpdateDoc(userRef, {
+                    isPro: true,
+                    proActivatedBy: 'kiwify_import',
+                    proActivatedAt: new Date().toISOString(),
+                    kiwifyOrderId: customer.orderId,
+                    kiwifyOrderRef: customer.orderRef,
+                    kiwifyCustomer: {
+                        email: customer.email,
+                        name: customer.name || 'Importado'
+                    }
+                });
+
+                if (user.isPro) {
+                    updated++;
+                } else {
+                    imported++;
+                }
+
+                console.log(`✅ Importado com vínculo: ${customer.email} (Order: ${customer.orderId})`);
+
+            } else {
+                // Usuário não existe - criar ativação pendente
+                const pendingRef = window.firebaseCollection(window.firebaseDb, 'pending_activations');
+
+                // Verificar se já existe ativação pendente
+                const pendingQuery = window.firebaseQuery(
+                    pendingRef,
+                    window.firebaseWhere('email', '==', customer.email)
+                );
+                const pendingSnap = await window.firebaseGetDocs(pendingQuery);
+
+                if (pendingSnap.empty) {
+                    // Adicionar nova ativação pendente
+                    await window.firebaseAddDoc(pendingRef, {
+                        email: customer.email,
+                        orderId: customer.orderId,
+                        orderRef: customer.orderRef,
+                        customerName: customer.name,
+                        createdAt: new Date().toISOString(),
+                        status: 'pending',
+                        source: 'kiwify_import'
+                    });
+                }
+
+                notFound++;
+                console.log(`⚠️ Usuário não encontrado (ativação pendente criada): ${customer.email}`);
+            }
+        }
+
+        // Mensagem final
+        let resultMessage = `✅ Importação concluída!\n\n`;
+
+        if (imported > 0) {
+            resultMessage += `✅ ${imported} novos clientes ativados com vínculo Kiwify\n`;
+        }
+
+        if (updated > 0) {
+            resultMessage += `🔄 ${updated} clientes já PRO atualizados com vínculo\n`;
+        }
+
+        if (notFound > 0) {
+            resultMessage += `⚠️ ${notFound} emails não encontrados\n(ativações pendentes criadas - serão ativados no primeiro login)`;
+        }
+
+        showToast(resultMessage, 'success');
+
+        // Recarregar lista
+        await loadUsers();
+
+        // Limpar textarea
+        document.getElementById('kiwifyImportData').value = '';
+
+    } catch (error) {
+        console.error('❌ Erro na importação Kiwify:', error);
+        showToast('❌ Erro ao importar clientes: ' + error.message, 'error');
+    }
+}
+
+window.importKiwifyCustomers = importKiwifyCustomers;
+
+// ========================================
 // FILTRO DE BUSCA
 // ========================================
 
@@ -331,4 +489,4 @@ function showToast(message, type = 'info') {
     }, 4000);
 }
 
-console.log('⚙️ Admin Panel v1.0.0 - by Nardoto');
+console.log('⚙️ Admin Panel v6.0.0 - Importação Kiwify - by Nardoto');
