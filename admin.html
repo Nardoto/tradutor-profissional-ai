@@ -382,9 +382,6 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Admin email (SUBSTITUA PELO SEU EMAIL!)
-        const ADMIN_EMAIL = 'nardotoengenharia@gmail.com';
-
         window.firebaseAuth = auth;
         window.firebaseDb = db;
         window.firebaseProvider = provider;
@@ -403,7 +400,7 @@
 
         // Carregar admin.js depois que Firebase estiver pronto
         const script = document.createElement('script');
-        script.src = 'admin.js?v=2.0.0'; // Versão 2.0.0 - Forçar atualização
+        script.src = 'admin.js?v=3.0.0'; // Versão 3.0.0 - Múltiplos admins
         document.body.appendChild(script);
     </script>
 </body>

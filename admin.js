@@ -8,8 +8,11 @@
 let currentUser = null;
 let allUsers = [];
 
-// Admin email - SUBSTITUA PELO SEU EMAIL!
-const ADMIN_EMAIL = 'nardotoengenharia@gmail.com';
+// Admin emails - Lista de administradores autorizados
+const ADMIN_EMAILS = [
+    'tharcisionardoto@gmail.com',  // Conta principal do Firebase
+    'nardotoengenharia@gmail.com'  // Conta secundária
+];
 
 // ========================================
 // AUTENTICAÇÃO
@@ -27,8 +30,8 @@ window.firebaseGetRedirectResult(window.firebaseAuth).then((result) => {
 
 window.firebaseOnAuthStateChanged(window.firebaseAuth, (user) => {
     if (user) {
-        // Verificar se é admin
-        if (user.email === ADMIN_EMAIL) {
+        // Verificar se é admin (pode ser qualquer email da lista)
+        if (ADMIN_EMAILS.includes(user.email)) {
             currentUser = user;
             showAdminPanel();
             loadUsers();
