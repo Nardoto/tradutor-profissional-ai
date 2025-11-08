@@ -399,8 +399,11 @@
         window.firebaseWhere = where;
 
         console.log('🔥 Firebase Admin initialized');
-    </script>
 
-    <script src="admin.js"></script>
+        // Carregar admin.js depois que Firebase estiver pronto
+        const script = document.createElement('script');
+        script.src = 'admin.js';
+        document.body.appendChild(script);
+    </script>
 </body>
 </html>
