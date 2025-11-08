@@ -1,0 +1,6 @@
+Status,Product Name,Payment Method,Plan Name,Customer Name,Customer Email,Customer Phone,Customer CPF / CNPJ,Customer IP,Sale Type,Price,Last Payment At,Started At,Ended At,Canceled At,Cancel Reason,Current Period Start,Current Period End
+active,CLUBE ASSINATURA,credit_card,PLANO VIP,Vitória Gomes Moreira Quito,vitoriagmquito@gmail.com,+17867152239,,66.176.168.108,producer,358.82,2025-11-06 15:47,2025-11-06 15:47,,,,2025-11-06 15:47,2025-12-06 15:47
+active,CLUBE ASSINATURA,credit_card,PLANO BASICO,PAULO HARISTEU DE ALMEIDA DE MAGALHAES,haristeu@gmail.com,+5527999629182,09085255759,128.201.242.10,producer,176.80,2025-11-06 14:27,2025-11-06 14:27,,,,2025-11-06 14:27,2025-12-06 14:27
+active,CLUBE ASSINATURA,credit_card,PLANO BASICO,Lucas Alvares Fontoura,lucask8@gmail.com,+5531992380729,07225170686,187.86.247.90,producer,176.80,2025-11-03 19:22,2025-11-03 19:22,,,,2025-11-03 19:22,2025-12-03 19:22
+active,CLUBE ASSINATURA,credit_card,PLANO VIP,Aline Portella,alinemportella@gmail.com,+556999958867,05663682180,45.171.107.44,producer,358.82,2025-11-03 18:42,2025-11-03 18:42,,,,2025-11-03 18:42,2025-12-03 18:42
+active,CLUBE ASSINATURA,credit_card,PLANO BASICO,LUCAS PATRICIO,androppz@gmail.com,+5551996859346,04104830011,2804:14c:7983:9b0a:3912:f6dc:7789:3ce8,producer,176.80,2025-11-03 12:50,2025-11-03 12:50,,,,2025-11-03 12:50,2025-12-03 12:50
