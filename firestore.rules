@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================
+    // USERS COLLECTION
+    // ========================================
+    match /users/{userId} {
+      // Usuários podem ler apenas seus próprios dados
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Usuários podem criar seu próprio documento no primeiro login
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Usuários podem atualizar apenas campos específicos (não o isPro)
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPro', 'proActivatedAt', 'proActivatedBy']);
+
+      // Admins podem ler todos os usuários
+      allow read: if request.auth != null
+                  && request.auth.token.email in [
+                    'tharcisionardoto@gmail.com',
+                    'nardotoengenharia@gmail.com'
+                  ];
+
+      // Apenas Cloud Functions podem modificar campos PRO
+      allow write: if false;
+    }
+
+    // ========================================
+    // PENDING ACTIVATIONS COLLECTION
+    // ========================================
+    match /pending_activations/{docId} {
+      // Apenas Cloud Functions podem gerenciar ativações pendentes
+      allow read, write: if false;
+    }
+
+    // ========================================
+    // TRANSLATIONS COLLECTION (opcional - para histórico)
+    // ========================================
+    match /translations/{translationId} {
+      // Usuários podem ler e criar suas próprias traduções
+      allow read, create: if request.auth != null
+                          && request.resource.data.userId == request.auth.uid;
+
+      // Usuários não podem editar ou deletar traduções
+      allow update, delete: if false;
+    }
+
+    // Negar acesso a qualquer outra collection por padrão
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
