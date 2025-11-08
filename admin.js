@@ -15,6 +15,16 @@ const ADMIN_EMAIL = 'nardotoengenharia@gmail.com';
 // AUTENTICAÇÃO
 // ========================================
 
+// Verificar resultado do redirect (quando volta do Google)
+window.firebaseGetRedirectResult(window.firebaseAuth).then((result) => {
+    if (result && result.user) {
+        console.log('Login via redirect bem-sucedido');
+    }
+}).catch((error) => {
+    console.error('Erro no redirect:', error);
+    showToast('❌ Erro no login. Tente novamente.', 'error');
+});
+
 window.firebaseOnAuthStateChanged(window.firebaseAuth, (user) => {
     if (user) {
         // Verificar se é admin
@@ -41,9 +51,10 @@ function showAdminPanel() {
     document.getElementById('adminPanel').style.display = 'block';
 }
 
-async function loginWithGoogle() {
+function loginWithGoogle() {
     try {
-        await window.firebaseSignInWithPopup(window.firebaseAuth, window.firebaseProvider);
+        // Usar redirect ao invés de popup (funciona melhor com CORS)
+        window.firebaseSignInWithRedirect(window.firebaseAuth, window.firebaseProvider);
     } catch (error) {
         console.error('Erro no login:', error);
         showToast('❌ Erro ao fazer login', 'error');
