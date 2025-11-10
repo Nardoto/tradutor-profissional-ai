@@ -55,8 +55,22 @@ class ProfessionalTranslator {
 
         document.getElementById('settingsButton').addEventListener('click', () => {
             document.getElementById('settingsModal').style.display = 'block';
-            this.renderApiKeysList(); // Renderizar lista ao abrir modal
+            this.loadApiKeyToInput(); // Carregar API Key existente no input
         });
+
+        // Botão de ajuda - abre modal com instruções expandidas
+        const helpButton = document.getElementById('helpButton');
+        if (helpButton) {
+            helpButton.addEventListener('click', () => {
+                document.getElementById('settingsModal').style.display = 'block';
+                this.loadApiKeyToInput();
+                // Expandir dropdown de instruções automaticamente
+                setTimeout(() => {
+                    const details = document.querySelector('#settingsModal details');
+                    if (details) details.open = true;
+                }, 100);
+            });
+        }
 
         document.getElementById('saveApiKeyButton').addEventListener('click', () => {
             this.saveApiKey();
@@ -959,21 +973,30 @@ Tradução:
 
     saveApiKey() {
         const keyInput = document.getElementById('newApiKeyInput');
-        const nameInput = document.getElementById('newApiKeyName');
-
         const key = keyInput.value.trim();
-        const name = nameInput.value.trim();
 
         if (!key) {
             this.showToast('⚠️ Digite uma API Key válida', 'warning');
             return;
         }
 
-        if (this.addApiKey(key, name || `API Key ${this.apiKeys.length + 1}`)) {
-            keyInput.value = '';
-            nameInput.value = '';
-            this.renderApiKeysList();
-            this.showToast('✅ API Key adicionada com sucesso!', 'success');
+        // Interface simplificada: substituir API Key existente ao invés de adicionar
+        this.apiKeys = [{
+            key: key,
+            name: 'API Key',
+            active: true
+        }];
+
+        this.currentKeyIndex = 0;
+        this.saveApiKeys();
+        this.showToast('✅ API Key salva com sucesso!', 'success');
+    }
+
+    loadApiKeyToInput() {
+        const keyInput = document.getElementById('newApiKeyInput');
+        const currentKey = this.getCurrentApiKey();
+        if (currentKey) {
+            keyInput.value = currentKey;
         }
     }
 
