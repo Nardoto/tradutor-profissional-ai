@@ -193,13 +193,9 @@
                     </svg>
                 </div>
 
-                <!-- Configurar API Key -->
-                <button id="settingsButton" class="btn-primary" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M16.2 12.5L15.4 13.9C15.1 14.5 15.2 15.2 15.7 15.7L16.3 16.3C16.5 16.5 16.5 16.8 16.3 17L17 17.7C17.2 17.9 17.5 17.9 17.7 17.7L18.3 17.1C18.8 16.6 19.5 16.5 20.1 16.8L21.5 17.6C21.8 17.8 22 18.1 22 18.5V19.5C22 19.8 21.8 20 21.5 20H18.5C18.2 20 18 19.8 18 19.5V18.5C18 18.1 17.8 17.8 17.5 17.6L16.1 16.8C15.5 16.5 14.8 16.6 14.3 17.1L13.7 17.7C13.5 17.9 13.2 17.9 13 17.7L12.3 17C12.1 16.8 12.1 16.5 12.3 16.3L12.9 15.7C13.4 15.2 13.5 14.5 13.2 13.9L12.4 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    Configurar API Key
+                <!-- Botão de Ajuda -->
+                <button id="helpButton" class="btn-secondary" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; font-size: 1.25rem;" title="Como usar">
+                    ❓
                 </button>
             </div>
         </div>
@@ -415,132 +411,98 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 600px;">
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
-                <h2>⚙️ Configurações</h2>
-                <button class="modal-close" onclick="document.getElementById('settingsModal').style.display='none'">&times;</button>
+                <h2>📖 Como Usar o Tradutor</h2>
+                <button class="modal-close" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
             </div>
-            <div class="modal-body">
-                <!-- Configuração de API Key -->
-                <div style="margin-bottom: 1.5rem;">
-                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem;">
-                        🔑 API Key do Google Gemini
+            <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+
+                <!-- Seção 1: Tradução Básica -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">🌐</span>
+                        Tradução Básica
                     </h3>
-
-                    <div style="margin-bottom: 1rem;">
-                        <input
-                            type="password"
-                            id="newApiKeyInput"
-                            placeholder="Cole sua API Key aqui..."
-                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-family: 'Courier New', monospace; font-size: 0.95rem;"
-                        >
-                    </div>
-
-                    <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
-                        <button id="saveApiKeyButton" class="btn-primary" style="flex: 1;">
-                            💾 Salvar
-                        </button>
-                        <button id="testApiKeyButton" class="btn-secondary" style="flex: 1;">
-                            🧪 Testar
-                        </button>
-                    </div>
-
-                    <details style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-left: 3px solid var(--accent-primary); border-radius: var(--radius-sm); cursor: pointer;">
-                        <summary style="list-style: none; font-weight: 600; color: var(--accent-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; user-select: none;">
-                            <span style="transition: transform 0.2s;">▶</span>
-                            📚 Como obter sua API Key GRATUITA
-                        </summary>
-
-                        <div style="background: #fff; padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; border: 1px solid var(--border-color);">
-                            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: var(--text-primary); line-height: 2;">
-                                <li style="margin-bottom: 0.5rem;">
-                                    <strong>Acesse o <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">Google AI Studio</a></strong>
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Faça login com sua <strong>conta Google</strong>
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Aceite os termos <strong>"Como um desenvolvedor"</strong> e clique em <strong>"Continuar"</strong>
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    No canto superior direito, clique em <strong>"Criar chave de API"</strong> (botão verde)
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Dê um nome para sua chave (ex: <code style="background: var(--bg-hover); padding: 0.2rem 0.4rem; border-radius: 3px; font-family: 'Courier New', monospace;">"tradutor"</code>)
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Escolha <strong>"Default Gemini Project"</strong>
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Clique no <strong>ícone de copiar</strong> ao lado da chave gerada
-                                </li>
-                                <li>
-                                    <strong>Cole a chave</strong> no campo acima e clique em "Salvar"
-                                </li>
-                            </ol>
-                        </div>
-
-                        <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 0.75rem;">
-                            <p style="margin: 0; color: #155724; font-size: 0.85rem; font-weight: 500;">
-                                ✅ <strong>100% GRATUITO!</strong> Sem necessidade de cartão de crédito.
-                            </p>
-                        </div>
-
-                        <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
-                            <p style="margin: 0; color: #856404; font-size: 0.8rem;">
-                                <strong>💡 Dica:</strong> Essa chave permite traduzir arquivos inteiros de uma só vez usando o poder da IA Google Gemini!
-                            </p>
-                        </div>
-                    </details>
+                    <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem; line-height: 1.8;">
+                        <li>Cole o texto que deseja traduzir no campo <strong>"Texto Original"</strong></li>
+                        <li>Selecione o <strong>idioma de destino</strong></li>
+                        <li>Clique em <strong>"Traduzir"</strong></li>
+                        <li>A tradução aparecerá automaticamente no campo ao lado</li>
+                    </ol>
                 </div>
+
+                <!-- Seção 2: Exportar TXT -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">📄</span>
+                        Exportar para TXT
+                    </h3>
+                    <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem;">
+                        Após traduzir, clique no botão <strong>"Exportar TXT"</strong> para baixar a tradução em formato de texto simples.
+                    </p>
+                </div>
+
+                <!-- Seção 3: Exportar SRT (Legendas) -->
+                <div style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
+                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">🎬</span>
+                        Traduzir Legendas (SRT)
+                    </h3>
+                    <div style="font-size: 0.9rem; line-height: 1.8;">
+                        <p style="margin: 0 0 1rem 0;"><strong>O que é SRT?</strong></p>
+                        <p style="margin: 0 0 1rem 0;">
+                            SRT é o formato de legenda mais usado em vídeos. Ele contém:
+                        </p>
+                        <ul style="margin: 0 0 1rem 0; padding-left: 1.5rem;">
+                            <li>Número da legenda</li>
+                            <li>Tempo de início e fim</li>
+                            <li>Texto da legenda</li>
+                        </ul>
+                        <p style="margin: 0 0 1rem 0;"><strong>Como usar:</strong></p>
+                        <ol style="margin: 0 0 1rem 0; padding-left: 1.5rem;">
+                            <li>Cole TODO o conteúdo do arquivo .srt no campo "Texto Original"</li>
+                            <li>Selecione o idioma de destino</li>
+                            <li>Clique em "Traduzir"</li>
+                            <li>Clique em <strong>"Exportar SRT"</strong> para baixar o arquivo traduzido</li>
+                        </ol>
+                        <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+                            <p style="margin: 0; color: #155724; font-size: 0.85rem;">
+                                ✅ O tradutor mantém automaticamente os timestamps e formatação do SRT!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção 4: API Key -->
+                <div style="margin-bottom: 1rem;">
+                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">🔑</span>
+                        Precisa de API Key?
+                    </h3>
+                    <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem;">
+                        Para traduções ilimitadas, você precisa de uma <strong>API Key do Google Gemini</strong>.
+                    </p>
+                    <div style="background: #fff; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-top: 1rem;">
+                        <p style="margin: 0 0 0.75rem 0; font-weight: 600; font-size: 0.9rem;">Como obter (GRÁTIS):</p>
+                        <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; line-height: 1.7;">
+                            <li>Acesse: <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary);">Google AI Studio</a></li>
+                            <li>Faça login com sua conta Google</li>
+                            <li>Clique em "Criar chave de API"</li>
+                            <li>Copie a chave gerada</li>
+                            <li>Cole no campo e salve</li>
+                        </ol>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
-
-    <!-- Login Screen -->
-    <div id="loginScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: var(--radius-md); padding: 3rem; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
-                    🌐 Tradutor Profissional AI
-                </h1>
-                <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                    Faça login para começar a traduzir
-                </p>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 2rem;">
-                <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1rem; text-align: center;">
-                    ✨ Plano GRATUITO Inclui:
-                </h3>
-                <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8;">
-                    <li><strong>50 traduções por dia</strong> com IA Google Gemini</li>
-                    <li><strong>Exportar TXT e SRT</strong> (legendas para vídeos)</li>
-                    <li><strong>Auto-detectar idiomas</strong> automaticamente</li>
-                    <li><strong>Traduções profissionais</strong> ilimitadas em caracteres</li>
-                </ul>
-            </div>
-
-            <button id="googleLoginButton" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem;">
-                <svg width="24" height="24" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Entrar com Google
-            </button>
-
-            <p style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin: 1.5rem 0 0 0;">
-                Ao fazer login, você concorda com nossos termos de uso
-            </p>
-        </div>
-    </div>
 
     <!-- Scripts Firebase -->
     <script type="module">

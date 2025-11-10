@@ -53,32 +53,13 @@ class ProfessionalTranslator {
             this.exportToSrt();
         });
 
-        document.getElementById('settingsButton').addEventListener('click', () => {
-            document.getElementById('settingsModal').style.display = 'block';
-            this.loadApiKeyToInput(); // Carregar API Key existente no input
-        });
-
-        // Botão de ajuda - abre modal com instruções expandidas
+        // Botão de ajuda - abre modal de instruções
         const helpButton = document.getElementById('helpButton');
         if (helpButton) {
             helpButton.addEventListener('click', () => {
-                document.getElementById('settingsModal').style.display = 'block';
-                this.loadApiKeyToInput();
-                // Expandir dropdown de instruções automaticamente
-                setTimeout(() => {
-                    const details = document.querySelector('#settingsModal details');
-                    if (details) details.open = true;
-                }, 100);
+                document.getElementById('helpModal').style.display = 'block';
             });
         }
-
-        document.getElementById('saveApiKeyButton').addEventListener('click', () => {
-            this.saveApiKey();
-        });
-
-        document.getElementById('testApiKeyButton').addEventListener('click', () => {
-            this.testApiKey();
-        });
 
         document.getElementById('copyOriginalButton').addEventListener('click', () => {
             this.copyToClipboard('originalText', 'Original');
@@ -107,18 +88,13 @@ class ProfessionalTranslator {
         });
 
         // Fechar modal ao clicar fora
-        document.getElementById('settingsModal').addEventListener('click', (e) => {
-            if (e.target.id === 'settingsModal') {
-                document.getElementById('settingsModal').style.display = 'none';
-            }
-        });
-
-        // Verificar se tem API Keys ao carregar
-        if (this.apiKeys.length === 0) {
-            setTimeout(() => {
-                this.showToast('⚠️ Configure pelo menos uma API Key do Google Gemini', 'warning');
-                document.getElementById('settingsModal').style.display = 'block';
-            }, 1000);
+        const helpModal = document.getElementById('helpModal');
+        if (helpModal) {
+            helpModal.addEventListener('click', (e) => {
+                if (e.target.id === 'helpModal') {
+                    helpModal.style.display = 'none';
+                }
+            });
         }
     }
 
