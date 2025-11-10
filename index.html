@@ -174,14 +174,13 @@
 <body>
     <!-- Main Content -->
     <div class="translator-container">
-        <div class="translator-header" style="position: relative;">
-            <h1 style="margin-bottom: 0.5rem;">🌐 Tradutor Profissional AI</h1>
-            <p style="color: var(--text-secondary); font-size: 1rem; margin: 0.5rem 0;">Traduções precisas e profissionais com inteligência artificial</p>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.5rem 0 2rem 0;">Desenvolvido por <strong>Nardoto</strong> | Powered by Google Gemini AI</p>
+        <div class="translator-header" style="position: relative; max-height: 100px; padding: 1rem 0;">
+            <h1 style="margin-bottom: 0.25rem; font-size: 2rem;">🌐 Tradutor Profissional AI</h1>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.25rem 0;">Traduções precisas e profissionais com inteligência artificial</p>
+            <p style="color: var(--text-secondary); font-size: 0.75rem; margin: 0.25rem 0 0 0;">Desenvolvido por <strong>Nardoto</strong> | Powered by Google Gemini AI</p>
 
-            <!-- Botões do Header -->
-            <div style="position: absolute; top: 0; right: 0; display: flex; gap: 1rem; align-items: center;">
-                <!-- Perfil do Usuário -->
+            <!-- Perfil do Usuário -->
+            <div style="position: absolute; top: 1rem; right: 0;">
                 <div id="userProfileButton" style="display: none; cursor: pointer; background: white; border: 2px solid var(--border-color); border-radius: 50px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.75rem; transition: all 0.3s;">
                     <img id="userAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                     <div style="text-align: left;">
@@ -192,16 +191,6 @@
                         <path d="M4 6l4 4 4-4"/>
                     </svg>
                 </div>
-
-                <!-- Botão Configurar API -->
-                <button id="settingsButton" class="btn-primary" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem;">
-                    ⚙️ Configurar
-                </button>
-
-                <!-- Botão de Ajuda -->
-                <button id="helpButton" class="btn-secondary" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; font-size: 1.25rem;" title="Como usar">
-                    ❓
-                </button>
             </div>
         </div>
 
