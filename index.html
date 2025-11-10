@@ -191,10 +191,10 @@
 <body>
     <!-- Main Content -->
     <div class="translator-container">
-        <div class="translator-header" style="position: relative; max-height: 100px; padding: 1rem 0;">
+        <div class="translator-header" style="position: relative; max-height: 50px; padding: 1rem 0;">
             <h1 style="margin-bottom: 0.25rem; font-size: 2rem;">🌐 Tradutor Profissional AI</h1>
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.25rem 0;">Traduções precisas e profissionais com inteligência artificial</p>
-            <p style="color: var(--text-secondary); font-size: 0.75rem; margin: 0.25rem 0 0 0;">Desenvolvido por <strong>Nardoto</strong> | Powered by Google Gemini AI</p>
+            <p style="color: var(--text-secondary); font-size: 0.75rem; margin: 0.25rem 0 0 0;">Desenvolvido por <strong>Nardoto</strong> | Powered by Groq & Gemini</p>
 
             <!-- Perfil do Usuário -->
             <div style="position: absolute; top: 1rem; right: 0;">
@@ -282,14 +282,6 @@
                 Traduzir
             </button>
 
-            <button id="exportButton" class="btn-secondary" style="display: none;" title="Exportar tradução como arquivo de texto (.txt)">
-                💾 Exportar TXT
-            </button>
-
-            <button id="exportSrtButton" class="btn-secondary" style="display: none;" title="Exportar como legenda com timestamps para vídeos (.srt)">
-                🎬 Exportar SRT (Legenda)
-            </button>
-
             <button id="clearButton" class="btn-secondary">
                 🗑️ Limpar
             </button>
@@ -317,14 +309,14 @@
                 Configurações de Legendas (SRT)
             </h4>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; align-items: end;">
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
                         📏 Caracteres por legenda:
                     </label>
                     <input type="number" id="srtCharsPerBlock" value="84" min="40" max="200"
                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
-                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 60-84 caracteres</small>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 60-84</small>
                 </div>
 
                 <div>
@@ -333,7 +325,19 @@
                     </label>
                     <input type="number" id="srtReadingRate" value="14" min="10" max="25" step="1"
                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
-                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 14-17 c/s</small>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 14-17</small>
+                </div>
+
+                <div>
+                    <button id="exportButton" class="btn-secondary" style="display: none; width: 100%; padding: 0.75rem;" title="Exportar tradução como arquivo de texto (.txt)">
+                        💾 Exportar TXT
+                    </button>
+                </div>
+
+                <div>
+                    <button id="exportSrtButton" class="btn-secondary" style="display: none; width: 100%; padding: 0.75rem;" title="Exportar como legenda com timestamps para vídeos (.srt)">
+                        🎬 Exportar SRT
+                    </button>
                 </div>
             </div>
 
