@@ -53,11 +53,36 @@ class ProfessionalTranslator {
             this.exportToSrt();
         });
 
+        // Botão de configurações - abre modal de API Key
+        const settingsButton = document.getElementById('settingsButton');
+        if (settingsButton) {
+            settingsButton.addEventListener('click', () => {
+                document.getElementById('settingsModal').style.display = 'block';
+                this.loadApiKeyToInput();
+            });
+        }
+
         // Botão de ajuda - abre modal de instruções
         const helpButton = document.getElementById('helpButton');
         if (helpButton) {
             helpButton.addEventListener('click', () => {
                 document.getElementById('helpModal').style.display = 'block';
+            });
+        }
+
+        // Salvar API Key
+        const saveApiKeyButton = document.getElementById('saveApiKeyButton');
+        if (saveApiKeyButton) {
+            saveApiKeyButton.addEventListener('click', () => {
+                this.saveApiKey();
+            });
+        }
+
+        // Testar API Key
+        const testApiKeyButton = document.getElementById('testApiKeyButton');
+        if (testApiKeyButton) {
+            testApiKeyButton.addEventListener('click', () => {
+                this.testApiKey();
             });
         }
 
@@ -87,12 +112,21 @@ class ProfessionalTranslator {
             this.updateTranslatedLabel(e.target.value);
         });
 
-        // Fechar modal ao clicar fora
+        // Fechar modais ao clicar fora
         const helpModal = document.getElementById('helpModal');
         if (helpModal) {
             helpModal.addEventListener('click', (e) => {
                 if (e.target.id === 'helpModal') {
                     helpModal.style.display = 'none';
+                }
+            });
+        }
+
+        const settingsModal = document.getElementById('settingsModal');
+        if (settingsModal) {
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target.id === 'settingsModal') {
+                    settingsModal.style.display = 'none';
                 }
             });
         }
