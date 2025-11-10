@@ -986,7 +986,7 @@ Tradução:
         const key = keyInput.value.trim();
 
         if (!key) {
-            this.showToast('⚠️ Digite uma API Key válida', 'warning');
+            this.showModalMessage('⚠️ Digite uma API Key válida', 'warning');
             return;
         }
 
@@ -999,7 +999,7 @@ Tradução:
 
         this.currentKeyIndex = 0;
         this.saveApiKeys();
-        this.showToast('✅ API Key salva com sucesso!', 'success');
+        this.showModalMessage('✅ API Key salva com sucesso!', 'success');
     }
 
     loadApiKeyToInput() {
@@ -1014,7 +1014,7 @@ Tradução:
         const currentKey = this.getCurrentApiKey();
 
         if (!currentKey) {
-            this.showToast('⚠️ Nenhuma API Key configurada', 'warning');
+            this.showModalMessage('⚠️ Nenhuma API Key configurada', 'warning');
             return;
         }
 
@@ -1037,16 +1037,16 @@ Tradução:
             );
 
             if (response.ok) {
-                this.showToast(`✅ ${this.getCurrentKeyName()} está válida!`, 'success');
+                this.showModalMessage(`✅ ${this.getCurrentKeyName()} está válida!`, 'success');
             } else {
                 const error = await response.json();
                 throw new Error(error.error?.message || 'API Key inválida');
             }
         } catch (error) {
-            this.showToast(`❌ Erro: ${error.message}`, 'error');
+            this.showModalMessage(`❌ Erro: ${error.message}`, 'error');
         } finally {
             testButton.disabled = false;
-            testButton.textContent = '🧪 Testar Conexão';
+            testButton.textContent = '🧪 Testar';
         }
     }
 
@@ -1076,6 +1076,48 @@ Tradução:
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
+    }
+
+    showModalMessage(message, type = 'info') {
+        const messageDiv = document.getElementById('apiKeyTestResult');
+        if (!messageDiv) return;
+
+        // Configurar cores e estilos baseado no tipo
+        const styles = {
+            success: {
+                background: 'linear-gradient(135deg, #10b98111 0%, #059e6911 100%)',
+                borderColor: '#10b981',
+                color: '#10b981'
+            },
+            error: {
+                background: 'linear-gradient(135deg, #ef444411 0%, #dc262611 100%)',
+                borderColor: '#ef4444',
+                color: '#ef4444'
+            },
+            warning: {
+                background: 'linear-gradient(135deg, #f59e0b11 0%, #d9790611 100%)',
+                borderColor: '#f59e0b',
+                color: '#f59e0b'
+            },
+            info: {
+                background: 'linear-gradient(135deg, #3b82f611 0%, #2563eb11 100%)',
+                borderColor: '#3b82f6',
+                color: '#3b82f6'
+            }
+        };
+
+        const style = styles[type] || styles.info;
+
+        messageDiv.style.display = 'block';
+        messageDiv.style.background = style.background;
+        messageDiv.style.borderColor = style.borderColor;
+        messageDiv.style.color = style.color;
+        messageDiv.textContent = message;
+
+        // Auto-esconder após 5 segundos
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
     }
 }
 
