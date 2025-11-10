@@ -12,6 +12,7 @@ class ProfessionalTranslator {
         // Sistema de múltiplas API Keys
         this.apiKeys = []; // Array de {key: string, name: string, active: boolean}
         this.currentKeyIndex = 0;
+        this.apiProvider = 'groq'; // 'gemini' ou 'groq' (padrão groq por ser grátis)
 
         this.isTranslating = false;
         this.translatedText = '';
@@ -84,6 +85,18 @@ class ProfessionalTranslator {
             testApiKeyButton.addEventListener('click', () => {
                 this.testApiKey();
             });
+        }
+
+        // Seletor de Provider
+        const providerSelect = document.getElementById('apiProviderSelect');
+        if (providerSelect) {
+            providerSelect.addEventListener('change', (e) => {
+                this.setApiProvider(e.target.value);
+            });
+            // Carregar provider salvo
+            const savedProvider = localStorage.getItem('apiProvider') || 'groq';
+            providerSelect.value = savedProvider;
+            this.setApiProvider(savedProvider);
         }
 
         document.getElementById('copyOriginalButton').addEventListener('click', () => {
@@ -656,42 +669,91 @@ TRADUÇÃO PARA ${targetLang.toUpperCase()}:`;
             }
 
             try {
-                const response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{ text: prompt }]
-                            }]
-                        })
-                    }
-                );
+                let response, data, translatedText;
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    const errorMessage = error.error?.message || 'Erro na API';
-
-                    // Verificar se é erro 429 (Resource Exhausted)
-                    if (response.status === 429 || errorMessage.includes('Resource exhausted')) {
-                        console.warn(`⚠️ Limite atingido na ${this.getCurrentKeyName()}`);
-
-                        // Tentar rotacionar para próxima key
-                        if (this.rotateToNextKey()) {
-                            this.showToast(`🔄 Limite atingido! Usando: ${this.getCurrentKeyName()}`, 'info');
-                            await this.sleep(1000); // Pausa antes de tentar próxima key
-                            continue; // Tentar com próxima key
-                        } else {
-                            throw new Error('Todas as API Keys atingiram o limite. Aguarde alguns minutos.');
+                if (this.apiProvider === 'groq') {
+                    // Usar Groq API
+                    response = await fetch(
+                        'https://api.groq.com/openai/v1/chat/completions',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${currentKey}`
+                            },
+                            body: JSON.stringify({
+                                model: 'llama-3.3-70b-versatile',
+                                messages: [{
+                                    role: 'user',
+                                    content: prompt
+                                }],
+                                temperature: 0.3
+                            })
                         }
+                    );
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        const errorMessage = error.error?.message || 'Erro na API Groq';
+
+                        // Verificar se é erro 429
+                        if (response.status === 429) {
+                            console.warn(`⚠️ Limite atingido na ${this.getCurrentKeyName()}`);
+
+                            if (this.rotateToNextKey()) {
+                                this.showToast(`🔄 Limite atingido! Usando: ${this.getCurrentKeyName()}`, 'info');
+                                await this.sleep(1000);
+                                continue;
+                            } else {
+                                throw new Error('Todas as API Keys atingiram o limite. Aguarde alguns minutos.');
+                            }
+                        }
+
+                        throw new Error(errorMessage);
                     }
 
-                    throw new Error(errorMessage);
-                }
+                    data = await response.json();
+                    translatedText = data.choices?.[0]?.message?.content;
 
-                const data = await response.json();
-                const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                } else {
+                    // Usar Gemini API
+                    response = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{ text: prompt }]
+                                }]
+                            })
+                        }
+                    );
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        const errorMessage = error.error?.message || 'Erro na API';
+
+                        // Verificar se é erro 429 (Resource Exhausted)
+                        if (response.status === 429 || errorMessage.includes('Resource exhausted')) {
+                            console.warn(`⚠️ Limite atingido na ${this.getCurrentKeyName()}`);
+
+                            // Tentar rotacionar para próxima key
+                            if (this.rotateToNextKey()) {
+                                this.showToast(`🔄 Limite atingido! Usando: ${this.getCurrentKeyName()}`, 'info');
+                                await this.sleep(1000); // Pausa antes de tentar próxima key
+                                continue; // Tentar com próxima key
+                            } else {
+                                throw new Error('Todas as API Keys atingiram o limite. Aguarde alguns minutos.');
+                            }
+                        }
+
+                        throw new Error(errorMessage);
+                    }
+
+                    data = await response.json();
+                    translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                }
 
                 if (!translatedText) {
                     throw new Error('Resposta vazia da IA');
@@ -1010,6 +1072,31 @@ Tradução:
         }
     }
 
+    setApiProvider(provider) {
+        this.apiProvider = provider;
+        localStorage.setItem('apiProvider', provider);
+
+        // Atualizar labels e instruções
+        const apiKeyLabel = document.getElementById('apiKeyLabel');
+        const providerInfo = document.getElementById('providerInfo');
+        const groqInstructions = document.getElementById('groqInstructions');
+        const geminiInstructions = document.getElementById('geminiInstructions');
+
+        if (provider === 'groq') {
+            if (apiKeyLabel) apiKeyLabel.textContent = '🔑 Groq API Key';
+            if (providerInfo) providerInfo.innerHTML = '🎁 <strong>Groq é 100% gratuito</strong> sem precisar de cartão!';
+            if (groqInstructions) groqInstructions.style.display = 'block';
+            if (geminiInstructions) geminiInstructions.style.display = 'none';
+        } else {
+            if (apiKeyLabel) apiKeyLabel.textContent = '🔑 Google Gemini API Key';
+            if (providerInfo) providerInfo.innerHTML = '⚠️ <strong>Gemini precisa conta de billing</strong> configurada';
+            if (groqInstructions) groqInstructions.style.display = 'none';
+            if (geminiInstructions) geminiInstructions.style.display = 'block';
+        }
+
+        console.log(`✅ Provider alterado para: ${provider}`);
+    }
+
     async testApiKey() {
         const currentKey = this.getCurrentApiKey();
 
@@ -1023,24 +1110,49 @@ Tradução:
         testButton.textContent = '🧪 Testando...';
 
         try {
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: 'Hello' }]
-                        }]
-                    })
-                }
-            );
+            let response;
+
+            if (this.apiProvider === 'groq') {
+                // Testar Groq API
+                response = await fetch(
+                    'https://api.groq.com/openai/v1/chat/completions',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${currentKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'llama-3.3-70b-versatile',
+                            messages: [{
+                                role: 'user',
+                                content: 'Say hello'
+                            }],
+                            max_tokens: 10
+                        })
+                    }
+                );
+            } else {
+                // Testar Gemini API
+                response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: 'Hello' }]
+                            }]
+                        })
+                    }
+                );
+            }
 
             if (response.ok) {
-                this.showModalMessage(`✅ ${this.getCurrentKeyName()} está válida!`, 'success');
+                this.showModalMessage(`✅ ${this.getCurrentKeyName()} está válida para ${this.apiProvider.toUpperCase()}!`, 'success');
             } else {
                 const error = await response.json();
-                throw new Error(error.error?.message || 'API Key inválida');
+                throw new Error(error.error?.message || error.message || 'API Key inválida');
             }
         } catch (error) {
             this.showModalMessage(`❌ Erro: ${error.message}`, 'error');

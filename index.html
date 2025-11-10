@@ -532,9 +532,23 @@
                 <button class="modal-close" onclick="document.getElementById('settingsModal').style.display='none'">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- Seletor de Provedor -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+                        🤖 Provedor de IA
+                    </label>
+                    <select id="apiProviderSelect" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; background: white;">
+                        <option value="gemini">Google Gemini (Precisa billing)</option>
+                        <option value="groq">Groq (100% Grátis - Recomendado)</option>
+                    </select>
+                    <p id="providerInfo" style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+                        🎁 <strong>Groq é 100% gratuito</strong> sem precisar de cartão!
+                    </p>
+                </div>
+
                 <div style="margin-bottom: 1rem;">
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
-                        🔑 Google Gemini API Key
+                        <span id="apiKeyLabel">🔑 Groq API Key</span>
                     </label>
                     <input
                         type="password"
@@ -556,16 +570,38 @@
                 <!-- Área de mensagens do teste/salvamento -->
                 <div id="apiKeyTestResult" class="api-key-message" style="display: none; padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 500; border-left: 3px solid;"></div>
 
-                <div style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
+                <!-- Instruções para Groq -->
+                <div id="groqInstructions" style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
                     <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--accent-primary); font-size: 0.9rem;">
-                        📚 Como obter (GRÁTIS):
+                        📚 Como obter Groq API (100% GRÁTIS - Sem Cartão):
+                    </p>
+                    <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; line-height: 1.7; color: var(--text-primary);">
+                        <li>Acesse: <a href="https://console.groq.com/" target="_blank" style="color: var(--accent-primary);">Groq Console</a></li>
+                        <li>Faça Sign Up com email ou Google</li>
+                        <li>Vá em "API Keys" no menu lateral</li>
+                        <li>Clique em "Create API Key"</li>
+                        <li>Copie a chave (começa com gsk_...) e cole acima</li>
+                    </ol>
+                    <p style="margin: 0.75rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+                        ⚡ <strong>Limite:</strong> 14.400 traduções por dia!
+                    </p>
+                </div>
+
+                <!-- Instruções para Gemini -->
+                <div id="geminiInstructions" style="display: none; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
+                    <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--accent-primary); font-size: 0.9rem;">
+                        📚 Como obter Gemini API (Precisa billing):
                     </p>
                     <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; line-height: 1.7; color: var(--text-primary);">
                         <li>Acesse: <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary);">Google AI Studio</a></li>
                         <li>Faça login com sua conta Google</li>
+                        <li>Configure conta de billing no projeto</li>
                         <li>Clique em "Criar chave de API"</li>
                         <li>Copie a chave e cole acima</li>
                     </ol>
+                    <p style="margin: 0.75rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+                        ⚠️ <strong>Limite:</strong> 200 traduções por dia (free tier)
+                    </p>
                 </div>
             </div>
         </div>
