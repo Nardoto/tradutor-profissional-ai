@@ -1,7 +1,7 @@
 // ========================================
 // PAINEL DE ADMINISTRAÇÃO
 // Admin Panel for Managing PRO Users
-// Version: 6.2.0 - Teste Grátis 3 Dias
+// Version: 6.3.0 - Fix data de criação + Ordenação
 // Desenvolvido por: Nardoto
 // ========================================
 
@@ -106,9 +106,9 @@ async function loadUsers() {
 
         // Ordenar por data de criação (mais recentes primeiro)
         allUsers.sort((a, b) => {
-            const dateA = new Date(a.createdAt || 0);
-            const dateB = new Date(b.createdAt || 0);
-            return dateB - dateA;
+            const dateA = getTimestamp(a.createdAt);
+            const dateB = getTimestamp(b.createdAt);
+            return dateB - dateA; // Mais recentes primeiro
         });
 
         updateStats();
@@ -197,9 +197,46 @@ function renderUsers(users) {
     }).join('');
 }
 
-function formatDate(dateString) {
-    if (!dateString) return 'Data desconhecida';
-    const date = new Date(dateString);
+// Converte qualquer formato de data para timestamp (ms)
+function getTimestamp(dateValue) {
+    if (!dateValue) return 0;
+
+    // Firestore Timestamp tem o método toDate()
+    if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+        return dateValue.toDate().getTime();
+    }
+    // Firestore Timestamp também pode ter seconds
+    if (dateValue.seconds) {
+        return dateValue.seconds * 1000;
+    }
+    // String ISO ou timestamp normal
+    const date = new Date(dateValue);
+    return isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+function formatDate(dateValue) {
+    if (!dateValue) return 'Data desconhecida';
+
+    let date;
+
+    // Firestore Timestamp tem o método toDate()
+    if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+        date = dateValue.toDate();
+    }
+    // Firestore Timestamp também pode ter seconds
+    else if (dateValue.seconds) {
+        date = new Date(dateValue.seconds * 1000);
+    }
+    // String ISO ou timestamp normal
+    else {
+        date = new Date(dateValue);
+    }
+
+    // Verificar se é data válida
+    if (isNaN(date.getTime())) {
+        return 'Data desconhecida';
+    }
+
     return date.toLocaleDateString('pt-BR');
 }
 
