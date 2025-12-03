@@ -1,13 +1,13 @@
 // ========================================
 // SISTEMA DE AUTENTICAÇÃO FIREBASE
 // Firebase Authentication Manager
-// Version: 3.2.0 - Trial Support
+// Version: 3.7.0 - Popup with Redirect Fallback
 // Desenvolvido por: Nardoto
 // ========================================
 
 class AuthManager {
     constructor() {
-        console.log('🔐 AuthManager v3.2.0 - Trial Support - by Nardoto');
+        console.log('🔐 AuthManager v3.7.0 - Popup with Redirect Fallback - by Nardoto');
 
         this.currentUser = null;
         this.userStats = {
@@ -28,11 +28,34 @@ class AuthManager {
         }, 500);
     }
 
-    setupFirebaseAuth() {
+    async setupFirebaseAuth() {
         if (!window.firebaseAuth || !window.firebaseOnAuthStateChanged) {
             console.error('❌ Firebase não está carregado!');
             this.showLoginScreen();
             return;
+        }
+
+        // Processar resultado do redirect (se houver)
+        console.log('🔍 Verificando resultado do redirect...');
+        try {
+            if (window.firebaseGetRedirectResult) {
+                const result = await window.firebaseGetRedirectResult(window.firebaseAuth);
+                console.log('📥 Resultado do redirect:', result);
+
+                if (result && result.user) {
+                    console.log('✅ Login via redirect bem-sucedido:', result.user.email);
+                    await this.createOrUpdateUserDocument(result.user);
+                    this.showToast('✅ Login realizado com sucesso!', 'success');
+                } else {
+                    console.log('ℹ️ Nenhum redirect pendente');
+                }
+            }
+        } catch (error) {
+            console.error('❌ Erro ao processar redirect:', error);
+            console.error('Detalhes do erro:', error.code, error.message);
+            if (error.code !== 'auth/popup-closed-by-user') {
+                this.showToast('❌ Erro ao fazer login. Tente novamente.', 'error');
+            }
         }
 
         // Monitorar estado de autenticação
@@ -40,6 +63,10 @@ class AuthManager {
             if (user) {
                 console.log('✅ Usuário autenticado:', user.email);
                 this.currentUser = user;
+
+                // Garantir que o documento existe
+                await this.createOrUpdateUserDocument(user);
+
                 await this.loadUserStats();
                 this.hideLoginScreen();
                 this.showUserProfile();
@@ -77,6 +104,12 @@ class AuthManager {
             upgradeBtn.addEventListener('click', () => this.showUpgradeModal());
         }
 
+        // Botão de teste grátis
+        const freeTrialBtn = document.getElementById('freeTrialButton');
+        if (freeTrialBtn) {
+            freeTrialBtn.addEventListener('click', () => this.activateFreeTrial());
+        }
+
         // Fechar menu ao clicar fora
         document.addEventListener('click', (e) => {
             const menu = document.getElementById('userDropdownMenu');
@@ -91,22 +124,33 @@ class AuthManager {
     async loginWithGoogle() {
         try {
             const provider = window.firebaseProvider;
-            const result = await window.firebaseSignInWithPopup(window.firebaseAuth, provider);
 
-            console.log('✅ Login bem-sucedido:', result.user.email);
+            // Tentar login com POPUP primeiro (mais confiável)
+            console.log('🪟 Tentando login com popup...');
 
-            // Criar ou atualizar documento do usuário
-            await this.createOrUpdateUserDocument(result.user);
+            try {
+                const result = await window.firebaseSignInWithPopup(window.firebaseAuth, provider);
 
-            this.showToast('✅ Login realizado com sucesso!', 'success');
+                if (result && result.user) {
+                    console.log('✅ Login com popup bem-sucedido:', result.user.email);
+                    await this.createOrUpdateUserDocument(result.user);
+                    this.showToast('✅ Login realizado com sucesso!', 'success');
+                }
+            } catch (popupError) {
+                // Se popup falhar (bloqueado), usar redirect como fallback
+                if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/cancelled-popup-request') {
+                    console.log('⚠️ Popup bloqueado, usando redirect...');
+
+                    await window.firebaseSetPersistence(window.firebaseAuth, window.firebaseBrowserLocalPersistence);
+                    await window.firebaseSignInWithRedirect(window.firebaseAuth, provider);
+                } else {
+                    throw popupError;
+                }
+            }
+
         } catch (error) {
             console.error('❌ Erro no login:', error);
-
-            if (error.code === 'auth/popup-closed-by-user') {
-                this.showToast('⚠️ Login cancelado', 'warning');
-            } else {
-                this.showToast('❌ Erro ao fazer login. Tente novamente.', 'error');
-            }
+            this.showToast('❌ Erro ao fazer login. Tente novamente.', 'error');
         }
     }
 
@@ -138,7 +182,8 @@ class AuthManager {
                 createdAt: new Date().toISOString(),
                 isPro: false,
                 translationsToday: 0,
-                lastReset: new Date().toDateString()
+                lastReset: new Date().toDateString(),
+                hasUsedTrial: false // Permitir uso do teste grátis
             });
             console.log('✅ Novo usuário criado no Firestore');
         } else {
@@ -201,6 +246,9 @@ class AuthManager {
 
                 this.updateUserStatsUI();
 
+                // Mostrar ou esconder botão de teste grátis
+                this.updateTrialButtonVisibility(data);
+
                 // Verificar ativações pendentes (caso tenha pago antes de fazer login)
                 if (!this.userStats.isPro) {
                     await this.checkPendingActivations();
@@ -231,6 +279,99 @@ class AuthManager {
             }
         } catch (error) {
             console.error('❌ Erro ao verificar ativações pendentes:', error);
+        }
+    }
+
+    updateTrialButtonVisibility(userData) {
+        const trialBtn = document.getElementById('freeTrialButton');
+
+        console.log('📊 Debug Trial Button:', {
+            buttonExists: !!trialBtn,
+            isPro: this.userStats.isPro,
+            hasUsedTrial: userData.hasUsedTrial,
+            shouldShow: !this.userStats.isPro && !userData.hasUsedTrial
+        });
+
+        if (!trialBtn) {
+            console.error('❌ Botão freeTrialButton não encontrado no DOM!');
+            return;
+        }
+
+        // Mostrar botão apenas se:
+        // - Usuário NÃO é PRO
+        // - Usuário NUNCA usou o teste grátis
+        const shouldShow = !this.userStats.isPro && !userData.hasUsedTrial;
+
+        if (shouldShow) {
+            trialBtn.style.display = 'flex';
+            console.log('✅ Botão de teste grátis VISÍVEL');
+        } else {
+            trialBtn.style.display = 'none';
+            if (this.userStats.isPro) {
+                console.log('⚠️ Botão oculto: usuário já é PRO');
+            }
+            if (userData.hasUsedTrial) {
+                console.log('⚠️ Botão oculto: usuário já utilizou o teste grátis');
+            }
+        }
+    }
+
+    async activateFreeTrial() {
+        if (!this.currentUser) {
+            this.showToast('⚠️ Faça login para ativar o teste grátis', 'warning');
+            return;
+        }
+
+        try {
+            // Confirmar ativação
+            const confirmed = confirm(
+                '🎁 Ativar teste grátis de 3 dias?\n\n' +
+                '✅ Você terá acesso completo ao Plano PRO\n' +
+                '⏰ Após 3 dias, você voltará ao plano grátis automaticamente\n' +
+                '⚠️ Esta é sua única chance de testar gratuitamente!\n\n' +
+                'Deseja continuar?'
+            );
+
+            if (!confirmed) {
+                console.log('❌ Ativação de teste cancelada pelo usuário');
+                return;
+            }
+
+            console.log('🎁 Ativando teste grátis de 3 dias...');
+
+            // Chamar Cloud Function para ativar teste
+            if (!window.firebaseFunctions) {
+                this.showToast('❌ Funções do Firebase não disponíveis', 'error');
+                return;
+            }
+
+            const activateFreeTrial = window.firebaseFunctions.httpsCallable('activateFreeTrial');
+            const result = await activateFreeTrial();
+
+            if (result.data.success) {
+                this.showToast('🎉 Teste grátis ativado! Você tem 3 dias de acesso PRO!', 'success');
+
+                // Recarregar stats e atualizar UI
+                await this.loadUserStats();
+
+                // Fechar menu do usuário
+                const menu = document.getElementById('userDropdownMenu');
+                if (menu) menu.style.display = 'none';
+
+                console.log('✅ Teste grátis ativado com sucesso!');
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao ativar teste grátis:', error);
+
+            // Tratar erros específicos
+            if (error.code === 'failed-precondition') {
+                this.showToast('⚠️ ' + error.message, 'warning');
+            } else if (error.code === 'unauthenticated') {
+                this.showToast('⚠️ Faça login para continuar', 'warning');
+            } else {
+                this.showToast('❌ Erro ao ativar teste grátis. Tente novamente.', 'error');
+            }
         }
     }
 

@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Tradutor Profissional - Powered by Google Gemini AI">
-    <title>Tradutor Profissional AI - Nardoto</title>
-    <link rel="icon" type="image/png" href="logo-nardoto.png">
+    <title>Tradutor Profissional - v3.0.0</title>
     <link rel="stylesheet" href="styles.css?v=2.8.6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,20 +12,22 @@
     <style>
         .translator-container {
             max-width: 1400px;
-            margin: 0.5rem auto 2rem auto;
+            margin: 2rem auto;
             padding: 0 2rem;
         }
 
         .translator-header {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
         }
 
         .translator-header h1 {
-            font-size: 1.5rem;
-            color: #1a1a1a;
-            font-weight: 700;
-            margin: 0;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
         .translator-grid {
@@ -156,11 +157,7 @@
             }
         }
 
-        /* Dropdown arrow animation */
-        details summary span:first-child {
-            transition: transform 0.2s;
-        }
-
+        /* Dropdown animation */
         details[open] summary span:first-child {
             transform: rotate(90deg);
         }
@@ -168,64 +165,41 @@
         details summary::-webkit-details-marker {
             display: none;
         }
-
-        /* Google Login Button */
-        .google-login-btn {
-            border: none;
-            outline: none;
-        }
-
-        .google-login-btn:hover {
-            background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%) !important;
-            border-color: var(--accent-primary) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-
-        .google-login-btn:active {
-            transform: translateY(0);
-        }
     </style>
 </head>
 <body>
     <!-- Main Content -->
     <div class="translator-container">
-        <div class="translator-header" style="position: relative; max-height: 50px; padding: 0.25rem 0; padding-right: 200px;">
-            <h1 style="margin: 0; font-size: 1.3rem; color: #1a1a1a; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-                <img src="logo-nardoto.png" alt="Nardoto Logo" style="height: 32px; width: 32px; object-fit: contain;">
-                Tradutor Profissional AI
-            </h1>
-            <p style="color: var(--text-secondary); font-size: 0.7rem; margin: 0.15rem 0 0 0;">Desenvolvido por <strong>Nardoto</strong> | Powered by Groq & Gemini | <span style="color: #6366f1; font-weight: 600;">v3.0.2</span></p>
+        <div class="translator-header">
+            <!-- Header com título e perfil -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <div style="flex: 1;"></div>
 
-            <!-- Perfil do Usuário -->
-            <div style="position: absolute; top: 0; right: 0;">
-                <!-- Botão de Login (visível quando NÃO está logado) -->
-                <button id="googleLoginButton" class="google-login-btn" style="display: none; cursor: pointer; background: white; border: 2px solid var(--border-color); border-radius: 50px; padding: 0.5rem 1rem; align-items: center; gap: 0.75rem; transition: all 0.3s; font-size: 0.9rem; font-weight: 600;">
-                    <svg width="18" height="18" viewBox="0 0 18 18" style="vertical-align: middle;">
-                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
-                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                        <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
-                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                    </svg>
-                    <span>Entrar com Google</span>
-                </button>
+                <!-- Título centralizado -->
+                <div style="flex: 1; text-align: center;">
+                    <h1 style="margin: 0; font-size: 1.5rem;">🌐 Tradutor Profissional AI</h1>
+                </div>
 
-                <!-- Perfil (visível quando está logado) -->
-                <div id="userProfileButton" style="display: none; cursor: pointer; background: white; border: 2px solid var(--border-color); border-radius: 50px; padding: 0.5rem 1rem; align-items: center; gap: 0.75rem; transition: all 0.3s;">
-                    <img id="userAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
-                    <div style="text-align: left;">
-                        <div id="userName" style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);"></div>
-                        <div id="userPlan" style="font-size: 0.75rem; color: var(--text-secondary);"></div>
+                <!-- Perfil do Usuário no canto direito -->
+                <div style="flex: 1; display: flex; justify-content: flex-end;">
+                    <div id="userProfileButton" style="cursor: pointer; background: white; border: 2px solid var(--border-color); border-radius: 50px; padding: 0.5rem 1rem; display: none; gap: 0.75rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <img id="userAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        <div style="text-align: left;">
+                            <div id="userName" style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);"></div>
+                            <div id="userPlan" style="font-size: 0.75rem; color: var(--text-secondary);"></div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 6l4 4 4-4"/>
+                        </svg>
                     </div>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 6l4 4 4-4"/>
-                    </svg>
                 </div>
             </div>
+
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.25rem 0 1.5rem 0; text-align: center;">Desenvolvido por <strong>Nardoto</strong> | Powered by Google Gemini AI</p>
         </div>
 
         <!-- Menu Dropdown do Usuário -->
-        <div id="userDropdownMenu" style="display: none; position: absolute; top: 80px; right: 2rem; background: white; border: 2px solid var(--border-color); border-radius: var(--radius-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.15); min-width: 280px; z-index: 1000;">
+        <div id="userDropdownMenu" style="display: none; position: absolute; top: 5rem; right: 2rem; background: white; border: 2px solid var(--border-color); border-radius: var(--radius-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.15); min-width: 280px; z-index: 1000;">
             <div style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
                 <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Uso de Hoje</div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
@@ -239,6 +213,9 @@
             </div>
 
             <div style="padding: 0.5rem;">
+                <button id="freeTrialButton" class="btn-success" style="width: 100%; margin-bottom: 0.5rem; justify-content: center; display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    🎁 Testar Grátis 3 Dias
+                </button>
                 <button id="upgradeButton" class="btn-primary" style="width: 100%; margin-bottom: 0.5rem; justify-content: center;">
                     ⭐ Upgrade para PRO
                 </button>
@@ -247,6 +224,8 @@
                 </button>
             </div>
         </div>
+
+        <!-- Tutorial Dropdown (Oculto por padrão) -->
 
         <!-- Controls -->
         <div class="controls">
@@ -283,6 +262,14 @@
                 Traduzir
             </button>
 
+            <button id="exportButton" class="btn-secondary" style="display: none;" title="Exportar tradução como arquivo de texto (.txt)">
+                💾 Exportar TXT
+            </button>
+
+            <button id="exportSrtButton" class="btn-secondary" style="display: none;" title="Exportar como legenda com timestamps para vídeos (.srt)">
+                🎬 Exportar SRT (Legenda)
+            </button>
+
             <button id="clearButton" class="btn-secondary">
                 🗑️ Limpar
             </button>
@@ -310,14 +297,14 @@
                 Configurações de Legendas (SRT)
             </h4>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; align-items: end;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
                         📏 Caracteres por legenda:
                     </label>
                     <input type="number" id="srtCharsPerBlock" value="84" min="40" max="200"
                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
-                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 60-84</small>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 60-84 caracteres</small>
                 </div>
 
                 <div>
@@ -326,19 +313,7 @@
                     </label>
                     <input type="number" id="srtReadingRate" value="14" min="10" max="25" step="1"
                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
-                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 14-17</small>
-                </div>
-
-                <div>
-                    <button id="exportButton" class="btn-secondary" style="display: none; width: 100%; padding: 0.75rem;" title="Exportar tradução como arquivo de texto (.txt)">
-                        💾 Exportar TXT
-                    </button>
-                </div>
-
-                <div>
-                    <button id="exportSrtButton" class="btn-secondary" style="display: none; width: 100%; padding: 0.75rem;" title="Exportar como legenda com timestamps para vídeos (.srt)">
-                        🎬 Exportar SRT
-                    </button>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 14-17 c/s</small>
                 </div>
             </div>
 
@@ -439,175 +414,87 @@
         </div>
     </div>
 
-    <!-- Help Modal -->
-    <div id="helpModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h2>📖 Como Usar o Tradutor</h2>
-                <button class="modal-close" onclick="document.getElementById('helpModal').style.display='none'">&times;</button>
-            </div>
-            <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
-
-                <!-- Seção 1: Tradução Básica -->
-                <div style="margin-bottom: 2rem;">
-                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">🌐</span>
-                        Tradução Básica
-                    </h3>
-                    <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem; line-height: 1.8;">
-                        <li>Cole o texto que deseja traduzir no campo <strong>"Texto Original"</strong></li>
-                        <li>Selecione o <strong>idioma de destino</strong></li>
-                        <li>Clique em <strong>"Traduzir"</strong></li>
-                        <li>A tradução aparecerá automaticamente no campo ao lado</li>
-                    </ol>
-                </div>
-
-                <!-- Seção 2: Exportar TXT -->
-                <div style="margin-bottom: 2rem;">
-                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">📄</span>
-                        Exportar para TXT
-                    </h3>
-                    <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem;">
-                        Após traduzir, clique no botão <strong>"Exportar TXT"</strong> para baixar a tradução em formato de texto simples.
-                    </p>
-                </div>
-
-                <!-- Seção 3: Exportar SRT (Legendas) -->
-                <div style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
-                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">🎬</span>
-                        Traduzir Legendas (SRT)
-                    </h3>
-                    <div style="font-size: 0.9rem; line-height: 1.8;">
-                        <p style="margin: 0 0 1rem 0;"><strong>O que é SRT?</strong></p>
-                        <p style="margin: 0 0 1rem 0;">
-                            SRT é o formato de legenda mais usado em vídeos. Ele contém:
-                        </p>
-                        <ul style="margin: 0 0 1rem 0; padding-left: 1.5rem;">
-                            <li>Número da legenda</li>
-                            <li>Tempo de início e fim</li>
-                            <li>Texto da legenda</li>
-                        </ul>
-                        <p style="margin: 0 0 1rem 0;"><strong>Como usar:</strong></p>
-                        <ol style="margin: 0 0 1rem 0; padding-left: 1.5rem;">
-                            <li>Cole TODO o conteúdo do arquivo .srt no campo "Texto Original"</li>
-                            <li>Selecione o idioma de destino</li>
-                            <li>Clique em "Traduzir"</li>
-                            <li>Clique em <strong>"Exportar SRT"</strong> para baixar o arquivo traduzido</li>
-                        </ol>
-                        <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
-                            <p style="margin: 0; color: #155724; font-size: 0.85rem;">
-                                ✅ O tradutor mantém automaticamente os timestamps e formatação do SRT!
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção 4: API Key -->
-                <div style="margin-bottom: 1rem;">
-                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">🔑</span>
-                        Precisa de API Key?
-                    </h3>
-                    <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem;">
-                        Para traduções ilimitadas, você precisa de uma <strong>API Key do Google Gemini</strong>.
-                    </p>
-                    <div style="background: #fff; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-top: 1rem;">
-                        <p style="margin: 0 0 0.75rem 0; font-weight: 600; font-size: 0.9rem;">Como obter (GRÁTIS):</p>
-                        <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; line-height: 1.7;">
-                            <li>Acesse: <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary);">Google AI Studio</a></li>
-                            <li>Faça login com sua conta Google</li>
-                            <li>Clique em "Criar chave de API"</li>
-                            <li>Copie a chave gerada</li>
-                            <li>Cole no campo e salve</li>
-                        </ol>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
-                <h2>⚙️ Configurar API Key</h2>
+                <h2>⚙️ Configurações</h2>
                 <button class="modal-close" onclick="document.getElementById('settingsModal').style.display='none'">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- Seletor de Provedor -->
+                <!-- Configuração de API Key -->
                 <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
-                        🤖 Provedor de IA
-                    </label>
-                    <select id="apiProviderSelect" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; background: white;">
-                        <option value="gemini">Google Gemini (Precisa billing)</option>
-                        <option value="groq">Groq (100% Grátis - Recomendado)</option>
-                    </select>
-                    <p id="providerInfo" style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
-                        🎁 <strong>Groq é 100% gratuito</strong> sem precisar de cartão!
-                    </p>
+                    <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1.1rem;">
+                        🔑 API Key do Google Gemini
+                    </h3>
+
+                    <div style="margin-bottom: 1rem;">
+                        <input
+                            type="password"
+                            id="newApiKeyInput"
+                            placeholder="Cole sua API Key aqui..."
+                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-family: 'Courier New', monospace; font-size: 0.95rem;"
+                        >
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
+                        <button id="saveApiKeyButton" class="btn-primary" style="flex: 1;">
+                            💾 Salvar
+                        </button>
+                        <button id="testApiKeyButton" class="btn-secondary" style="flex: 1;">
+                            🧪 Testar
+                        </button>
+                    </div>
+
+                    <details style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-left: 3px solid var(--accent-primary); border-radius: var(--radius-sm); cursor: pointer;">
+                        <summary style="list-style: none; font-weight: 600; color: var(--accent-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; user-select: none;">
+                            <span style="transition: transform 0.2s;">▶</span>
+                            📚 Como obter sua API Key GRATUITA
+                        </summary>
+
+                        <div style="background: #fff; padding: 1rem; border-radius: var(--radius-sm); margin: 1rem 0 1rem 0; border: 1px solid var(--border-color);">
+                            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: var(--text-primary); line-height: 2;">
+                                <li style="margin-bottom: 0.5rem;">
+                                    <strong>Acesse o <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">Google AI Studio</a></strong>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    Faça login com sua <strong>conta Google</strong>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    Aceite os termos <strong>"Como um desenvolvedor"</strong> e clique em <strong>"Continuar"</strong>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    No canto superior direito, clique em <strong>"Criar chave de API"</strong> (botão verde)
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    Dê um nome para sua chave (ex: <code style="background: var(--bg-hover); padding: 0.2rem 0.4rem; border-radius: 3px; font-family: 'Courier New', monospace;">"tradutor"</code>)
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    Escolha <strong>"Default Gemini Project"</strong>
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    Clique no <strong>ícone de copiar</strong> ao lado da chave gerada
+                                </li>
+                                <li>
+                                    <strong>Cole a chave</strong> no campo acima e clique em "Salvar"
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 0.75rem;">
+                            <p style="margin: 0; color: #155724; font-size: 0.85rem; font-weight: 500;">
+                                ✅ <strong>100% GRATUITO!</strong> Sem necessidade de cartão de crédito.
+                            </p>
+                        </div>
+
+                        <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+                            <p style="margin: 0; color: #856404; font-size: 0.8rem;">
+                                <strong>💡 Dica:</strong> Essa chave permite traduzir arquivos inteiros de uma só vez usando o poder da IA Google Gemini!
+                            </p>
+                        </div>
+                    </details>
                 </div>
 
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
-                        <span id="apiKeyLabel">🔑 Groq API Key</span>
-                    </label>
-                    <input
-                        type="password"
-                        id="newApiKeyInput"
-                        placeholder="Cole sua API Key aqui..."
-                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-family: 'Courier New', monospace; font-size: 0.95rem;"
-                    >
-                </div>
-
-                <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
-                    <button id="saveApiKeyButton" class="btn-primary" style="flex: 1;">
-                        💾 Salvar
-                    </button>
-                    <button id="testApiKeyButton" class="btn-secondary" style="flex: 1;">
-                        🧪 Testar
-                    </button>
-                </div>
-
-                <!-- Área de mensagens do teste/salvamento -->
-                <div id="apiKeyTestResult" class="api-key-message" style="display: none; padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 500; border-left: 3px solid;"></div>
-
-                <!-- Instruções para Groq -->
-                <div id="groqInstructions" style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
-                    <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--accent-primary); font-size: 0.9rem;">
-                        📚 Como obter Groq API (100% GRÁTIS - Sem Cartão):
-                    </p>
-                    <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; line-height: 1.7; color: var(--text-primary);">
-                        <li>Acesse: <a href="https://console.groq.com/" target="_blank" style="color: var(--accent-primary);">Groq Console</a></li>
-                        <li>Faça Sign Up com email ou Google</li>
-                        <li>Vá em "API Keys" no menu lateral</li>
-                        <li>Clique em "Create API Key"</li>
-                        <li>Copie a chave (começa com gsk_...) e cole acima</li>
-                    </ol>
-                    <p style="margin: 0.75rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
-                        ⚡ <strong>Limite:</strong> 14.400 traduções por dia!
-                    </p>
-                </div>
-
-                <!-- Instruções para Gemini -->
-                <div id="geminiInstructions" style="display: none; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
-                    <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--accent-primary); font-size: 0.9rem;">
-                        📚 Como obter Gemini API (Precisa billing):
-                    </p>
-                    <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; line-height: 1.7; color: var(--text-primary);">
-                        <li>Acesse: <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: var(--accent-primary);">Google AI Studio</a></li>
-                        <li>Faça login com sua conta Google</li>
-                        <li>Configure conta de billing no projeto</li>
-                        <li>Clique em "Criar chave de API"</li>
-                        <li>Copie a chave e cole acima</li>
-                    </ol>
-                    <p style="margin: 0.75rem 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
-                        ⚠️ <strong>Limite:</strong> 200 traduções por dia (free tier)
-                    </p>
-                </div>
             </div>
         </div>
     </div>
@@ -615,11 +502,51 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
+    <!-- Login Screen -->
+    <div id="loginScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: var(--radius-md); padding: 3rem; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
+                    🌐 Tradutor Profissional AI
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                    Faça login para começar a traduzir
+                </p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 2rem;">
+                <h3 style="color: var(--accent-primary); margin: 0 0 1rem 0; font-size: 1rem; text-align: center;">
+                    ✨ Plano GRATUITO Inclui:
+                </h3>
+                <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8;">
+                    <li><strong>50 traduções por dia</strong> com IA Google Gemini</li>
+                    <li><strong>Exportar TXT e SRT</strong> (legendas para vídeos)</li>
+                    <li><strong>Auto-detectar idiomas</strong> automaticamente</li>
+                    <li><strong>Traduções profissionais</strong> ilimitadas em caracteres</li>
+                </ul>
+            </div>
+
+            <button id="googleLoginButton" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Entrar com Google
+            </button>
+
+            <p style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin: 1.5rem 0 0 0;">
+                Ao fazer login, você concorda com nossos termos de uso
+            </p>
+        </div>
+    </div>
+
     <!-- Scripts Firebase -->
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, setPersistence, browserLocalPersistence, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
 
@@ -640,12 +567,25 @@
         const functions = getFunctions(app);
         const provider = new GoogleAuthProvider();
 
+        // Configurar persistência LOCAL (manter login entre sessões)
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                console.log('✅ Persistência LOCAL configurada');
+            })
+            .catch((error) => {
+                console.error('❌ Erro ao configurar persistência:', error);
+            });
+
         // Disponibilizar globalmente
         window.firebaseAuth = auth;
         window.firebaseDb = db;
         window.firebaseFunctions = { httpsCallable: (name) => httpsCallable(functions, name) };
         window.firebaseProvider = provider;
+        window.firebaseSetPersistence = setPersistence;
+        window.firebaseBrowserLocalPersistence = browserLocalPersistence;
         window.firebaseSignInWithPopup = signInWithPopup;
+        window.firebaseSignInWithRedirect = signInWithRedirect;
+        window.firebaseGetRedirectResult = getRedirectResult;
         window.firebaseOnAuthStateChanged = onAuthStateChanged;
         window.firebaseSignOut = signOut;
         window.firebaseDoc = doc;
@@ -657,8 +597,20 @@
         console.log('🔥 Firebase initialized');
     </script>
 
+    <!-- Help Toggle Function -->
+    <script>
+        function toggleHelp() {
+            const helpPanel = document.getElementById('helpPanel');
+            if (helpPanel.style.display === 'none') {
+                helpPanel.style.display = 'block';
+            } else {
+                helpPanel.style.display = 'none';
+            }
+        }
+    </script>
+
     <!-- Scripts -->
-    <script src="auth.js?v=3.1.0"></script>
+    <script src="auth.js?v=3.7.0"></script>
     <script src="translator.js?v=3.0.0"></script>
     <script src="payment.js?v=1.0.0"></script>
 </body>

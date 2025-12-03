@@ -12,7 +12,6 @@ class ProfessionalTranslator {
         // Sistema de múltiplas API Keys
         this.apiKeys = []; // Array de {key: string, name: string, active: boolean}
         this.currentKeyIndex = 0;
-        this.apiProvider = 'groq'; // 'gemini' ou 'groq' (padrão groq por ser grátis)
 
         this.isTranslating = false;
         this.translatedText = '';
@@ -54,50 +53,18 @@ class ProfessionalTranslator {
             this.exportToSrt();
         });
 
-        // Botão de configurações - abre modal de API Key
-        const settingsButton = document.getElementById('settingsButton');
-        if (settingsButton) {
-            settingsButton.addEventListener('click', () => {
-                document.getElementById('settingsModal').style.display = 'block';
-                this.loadApiKeyToInput();
-            });
-        }
+        document.getElementById('settingsButton').addEventListener('click', () => {
+            document.getElementById('settingsModal').style.display = 'block';
+            this.renderApiKeysList(); // Renderizar lista ao abrir modal
+        });
 
-        // Botão de ajuda - abre modal de instruções
-        const helpButton = document.getElementById('helpButton');
-        if (helpButton) {
-            helpButton.addEventListener('click', () => {
-                document.getElementById('helpModal').style.display = 'block';
-            });
-        }
+        document.getElementById('saveApiKeyButton').addEventListener('click', () => {
+            this.saveApiKey();
+        });
 
-        // Salvar API Key
-        const saveApiKeyButton = document.getElementById('saveApiKeyButton');
-        if (saveApiKeyButton) {
-            saveApiKeyButton.addEventListener('click', () => {
-                this.saveApiKey();
-            });
-        }
-
-        // Testar API Key
-        const testApiKeyButton = document.getElementById('testApiKeyButton');
-        if (testApiKeyButton) {
-            testApiKeyButton.addEventListener('click', () => {
-                this.testApiKey();
-            });
-        }
-
-        // Seletor de Provider
-        const providerSelect = document.getElementById('apiProviderSelect');
-        if (providerSelect) {
-            providerSelect.addEventListener('change', (e) => {
-                this.setApiProvider(e.target.value);
-            });
-            // Carregar provider salvo
-            const savedProvider = localStorage.getItem('apiProvider') || 'groq';
-            providerSelect.value = savedProvider;
-            this.setApiProvider(savedProvider);
-        }
+        document.getElementById('testApiKeyButton').addEventListener('click', () => {
+            this.testApiKey();
+        });
 
         document.getElementById('copyOriginalButton').addEventListener('click', () => {
             this.copyToClipboard('originalText', 'Original');
@@ -125,23 +92,19 @@ class ProfessionalTranslator {
             this.updateTranslatedLabel(e.target.value);
         });
 
-        // Fechar modais ao clicar fora
-        const helpModal = document.getElementById('helpModal');
-        if (helpModal) {
-            helpModal.addEventListener('click', (e) => {
-                if (e.target.id === 'helpModal') {
-                    helpModal.style.display = 'none';
-                }
-            });
-        }
+        // Fechar modal ao clicar fora
+        document.getElementById('settingsModal').addEventListener('click', (e) => {
+            if (e.target.id === 'settingsModal') {
+                document.getElementById('settingsModal').style.display = 'none';
+            }
+        });
 
-        const settingsModal = document.getElementById('settingsModal');
-        if (settingsModal) {
-            settingsModal.addEventListener('click', (e) => {
-                if (e.target.id === 'settingsModal') {
-                    settingsModal.style.display = 'none';
-                }
-            });
+        // Verificar se tem API Keys ao carregar
+        if (this.apiKeys.length === 0) {
+            setTimeout(() => {
+                this.showToast('⚠️ Configure pelo menos uma API Key do Google Gemini', 'warning');
+                document.getElementById('settingsModal').style.display = 'block';
+            }, 1000);
         }
     }
 
@@ -669,91 +632,42 @@ TRADUÇÃO PARA ${targetLang.toUpperCase()}:`;
             }
 
             try {
-                let response, data, translatedText;
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: prompt }]
+                            }]
+                        })
+                    }
+                );
 
-                if (this.apiProvider === 'groq') {
-                    // Usar Groq API
-                    response = await fetch(
-                        'https://api.groq.com/openai/v1/chat/completions',
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${currentKey}`
-                            },
-                            body: JSON.stringify({
-                                model: 'llama-3.3-70b-versatile',
-                                messages: [{
-                                    role: 'user',
-                                    content: prompt
-                                }],
-                                temperature: 0.3
-                            })
+                if (!response.ok) {
+                    const error = await response.json();
+                    const errorMessage = error.error?.message || 'Erro na API';
+
+                    // Verificar se é erro 429 (Resource Exhausted)
+                    if (response.status === 429 || errorMessage.includes('Resource exhausted')) {
+                        console.warn(`⚠️ Limite atingido na ${this.getCurrentKeyName()}`);
+
+                        // Tentar rotacionar para próxima key
+                        if (this.rotateToNextKey()) {
+                            this.showToast(`🔄 Limite atingido! Usando: ${this.getCurrentKeyName()}`, 'info');
+                            await this.sleep(1000); // Pausa antes de tentar próxima key
+                            continue; // Tentar com próxima key
+                        } else {
+                            throw new Error('Todas as API Keys atingiram o limite. Aguarde alguns minutos.');
                         }
-                    );
-
-                    if (!response.ok) {
-                        const error = await response.json();
-                        const errorMessage = error.error?.message || 'Erro na API Groq';
-
-                        // Verificar se é erro 429
-                        if (response.status === 429) {
-                            console.warn(`⚠️ Limite atingido na ${this.getCurrentKeyName()}`);
-
-                            if (this.rotateToNextKey()) {
-                                this.showToast(`🔄 Limite atingido! Usando: ${this.getCurrentKeyName()}`, 'info');
-                                await this.sleep(1000);
-                                continue;
-                            } else {
-                                throw new Error('Todas as API Keys atingiram o limite. Aguarde alguns minutos.');
-                            }
-                        }
-
-                        throw new Error(errorMessage);
                     }
 
-                    data = await response.json();
-                    translatedText = data.choices?.[0]?.message?.content;
-
-                } else {
-                    // Usar Gemini API
-                    response = await fetch(
-                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
-                        {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{
-                                    parts: [{ text: prompt }]
-                                }]
-                            })
-                        }
-                    );
-
-                    if (!response.ok) {
-                        const error = await response.json();
-                        const errorMessage = error.error?.message || 'Erro na API';
-
-                        // Verificar se é erro 429 (Resource Exhausted)
-                        if (response.status === 429 || errorMessage.includes('Resource exhausted')) {
-                            console.warn(`⚠️ Limite atingido na ${this.getCurrentKeyName()}`);
-
-                            // Tentar rotacionar para próxima key
-                            if (this.rotateToNextKey()) {
-                                this.showToast(`🔄 Limite atingido! Usando: ${this.getCurrentKeyName()}`, 'info');
-                                await this.sleep(1000); // Pausa antes de tentar próxima key
-                                continue; // Tentar com próxima key
-                            } else {
-                                throw new Error('Todas as API Keys atingiram o limite. Aguarde alguns minutos.');
-                            }
-                        }
-
-                        throw new Error(errorMessage);
-                    }
-
-                    data = await response.json();
-                    translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    throw new Error(errorMessage);
                 }
+
+                const data = await response.json();
+                const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
                 if (!translatedText) {
                     throw new Error('Resposta vazia da IA');
@@ -1045,63 +959,27 @@ Tradução:
 
     saveApiKey() {
         const keyInput = document.getElementById('newApiKeyInput');
+
         const key = keyInput.value.trim();
+        const name = `API Key ${this.apiKeys.length + 1}`;
 
         if (!key) {
-            this.showModalMessage('⚠️ Digite uma API Key válida', 'warning');
+            this.showToast('⚠️ Digite uma API Key válida', 'warning');
             return;
         }
 
-        // Interface simplificada: substituir API Key existente ao invés de adicionar
-        this.apiKeys = [{
-            key: key,
-            name: 'API Key',
-            active: true
-        }];
-
-        this.currentKeyIndex = 0;
-        this.saveApiKeys();
-        this.showModalMessage('✅ API Key salva com sucesso!', 'success');
-    }
-
-    loadApiKeyToInput() {
-        const keyInput = document.getElementById('newApiKeyInput');
-        const currentKey = this.getCurrentApiKey();
-        if (currentKey) {
-            keyInput.value = currentKey;
+        if (this.addApiKey(key, name)) {
+            keyInput.value = '';
+            this.renderApiKeysList();
+            this.showToast('✅ API Key adicionada com sucesso!', 'success');
         }
-    }
-
-    setApiProvider(provider) {
-        this.apiProvider = provider;
-        localStorage.setItem('apiProvider', provider);
-
-        // Atualizar labels e instruções
-        const apiKeyLabel = document.getElementById('apiKeyLabel');
-        const providerInfo = document.getElementById('providerInfo');
-        const groqInstructions = document.getElementById('groqInstructions');
-        const geminiInstructions = document.getElementById('geminiInstructions');
-
-        if (provider === 'groq') {
-            if (apiKeyLabel) apiKeyLabel.textContent = '🔑 Groq API Key';
-            if (providerInfo) providerInfo.innerHTML = '🎁 <strong>Groq é 100% gratuito</strong> sem precisar de cartão!';
-            if (groqInstructions) groqInstructions.style.display = 'block';
-            if (geminiInstructions) geminiInstructions.style.display = 'none';
-        } else {
-            if (apiKeyLabel) apiKeyLabel.textContent = '🔑 Google Gemini API Key';
-            if (providerInfo) providerInfo.innerHTML = '⚠️ <strong>Gemini precisa conta de billing</strong> configurada';
-            if (groqInstructions) groqInstructions.style.display = 'none';
-            if (geminiInstructions) geminiInstructions.style.display = 'block';
-        }
-
-        console.log(`✅ Provider alterado para: ${provider}`);
     }
 
     async testApiKey() {
         const currentKey = this.getCurrentApiKey();
 
         if (!currentKey) {
-            this.showModalMessage('⚠️ Nenhuma API Key configurada', 'warning');
+            this.showToast('⚠️ Nenhuma API Key configurada', 'warning');
             return;
         }
 
@@ -1110,55 +988,30 @@ Tradução:
         testButton.textContent = '🧪 Testando...';
 
         try {
-            let response;
-
-            if (this.apiProvider === 'groq') {
-                // Testar Groq API
-                response = await fetch(
-                    'https://api.groq.com/openai/v1/chat/completions',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${currentKey}`
-                        },
-                        body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
-                            messages: [{
-                                role: 'user',
-                                content: 'Say hello'
-                            }],
-                            max_tokens: 10
-                        })
-                    }
-                );
-            } else {
-                // Testar Gemini API
-                response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{ text: 'Hello' }]
-                            }]
-                        })
-                    }
-                );
-            }
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${currentKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: 'Hello' }]
+                        }]
+                    })
+                }
+            );
 
             if (response.ok) {
-                this.showModalMessage(`✅ ${this.getCurrentKeyName()} está válida para ${this.apiProvider.toUpperCase()}!`, 'success');
+                this.showToast(`✅ ${this.getCurrentKeyName()} está válida!`, 'success');
             } else {
                 const error = await response.json();
-                throw new Error(error.error?.message || error.message || 'API Key inválida');
+                throw new Error(error.error?.message || 'API Key inválida');
             }
         } catch (error) {
-            this.showModalMessage(`❌ Erro: ${error.message}`, 'error');
+            this.showToast(`❌ Erro: ${error.message}`, 'error');
         } finally {
             testButton.disabled = false;
-            testButton.textContent = '🧪 Testar';
+            testButton.textContent = '🧪 Testar Conexão';
         }
     }
 
@@ -1188,48 +1041,6 @@ Tradução:
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
-    }
-
-    showModalMessage(message, type = 'info') {
-        const messageDiv = document.getElementById('apiKeyTestResult');
-        if (!messageDiv) return;
-
-        // Configurar cores e estilos baseado no tipo
-        const styles = {
-            success: {
-                background: 'linear-gradient(135deg, #10b98111 0%, #059e6911 100%)',
-                borderColor: '#10b981',
-                color: '#10b981'
-            },
-            error: {
-                background: 'linear-gradient(135deg, #ef444411 0%, #dc262611 100%)',
-                borderColor: '#ef4444',
-                color: '#ef4444'
-            },
-            warning: {
-                background: 'linear-gradient(135deg, #f59e0b11 0%, #d9790611 100%)',
-                borderColor: '#f59e0b',
-                color: '#f59e0b'
-            },
-            info: {
-                background: 'linear-gradient(135deg, #3b82f611 0%, #2563eb11 100%)',
-                borderColor: '#3b82f6',
-                color: '#3b82f6'
-            }
-        };
-
-        const style = styles[type] || styles.info;
-
-        messageDiv.style.display = 'block';
-        messageDiv.style.background = style.background;
-        messageDiv.style.borderColor = style.borderColor;
-        messageDiv.style.color = style.color;
-        messageDiv.textContent = message;
-
-        // Auto-esconder após 5 segundos
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 5000);
     }
 }
 

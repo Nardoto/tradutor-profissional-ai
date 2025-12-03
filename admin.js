@@ -204,13 +204,54 @@ function formatDate(dateString) {
 }
 
 // ========================================
-// ATIVAR/DESATIVAR PRO
+// ATIVAR/DESATIVAR PRO - NOVO SISTEMA COM PLANOS
 // ========================================
 
-async function togglePro(userId, email, activate) {
-    const action = activate ? 'ativar' : 'desativar';
+// Configuração de planos
+const PLANS = {
+    free: {
+        id: 'free',
+        name: 'FREE (Grátis)',
+        features: [],
+        isPro: false
+    },
+    basic: {
+        id: 'basic',
+        name: 'BÁSICO',
+        features: ['veo3-automator', 'wisk-automator', 'tradutor-ai-unlimited'],
+        isPro: true
+    },
+    vip: {
+        id: 'vip',
+        name: 'VIP (Tudo Liberado)',
+        features: ['all-features'],
+        isPro: true
+    }
+};
 
-    if (!confirm(`Tem certeza que deseja ${action} PRO para ${email}?`)) {
+async function changePlan(userId, email) {
+    // Mostrar dialog para escolher o plano
+    const planChoice = prompt(
+        `Escolha o plano para ${email}:\n\n` +
+        `1 - FREE (Grátis) - Sem acesso\n` +
+        `2 - BÁSICO - VEO3, Wisk, Tradutor AI\n` +
+        `3 - VIP - TUDO liberado (inclui futuras extensões)\n\n` +
+        `Digite 1, 2 ou 3:`
+    );
+
+    let plan;
+    if (planChoice === '1') {
+        plan = PLANS.free;
+    } else if (planChoice === '2') {
+        plan = PLANS.basic;
+    } else if (planChoice === '3') {
+        plan = PLANS.vip;
+    } else {
+        showToast('❌ Opção inválida!', 'error');
+        return;
+    }
+
+    if (!confirm(`Confirmar mudança para plano ${plan.name}?`)) {
         return;
     }
 
@@ -218,22 +259,56 @@ async function togglePro(userId, email, activate) {
         const userRef = window.firebaseDoc(window.firebaseDb, 'users', userId);
 
         await window.firebaseUpdateDoc(userRef, {
-            isPro: activate,
-            proActivatedBy: activate ? 'admin_manual' : null,
-            proActivatedAt: activate ? new Date().toISOString() : null
+            plan: plan.id,
+            isPro: plan.isPro,
+            features: plan.features,
+            proActivatedBy: plan.isPro ? 'admin_manual' : null,
+            proActivatedAt: plan.isPro ? new Date().toISOString() : null
         });
 
-        showToast(`✅ PRO ${activate ? 'ativado' : 'desativado'} para ${email}!`, 'success');
+        showToast(`✅ Plano ${plan.name} ativado para ${email}!`, 'success');
 
         // Recarregar lista
         await loadUsers();
     } catch (error) {
         console.error('Erro ao atualizar usuário:', error);
-        showToast(`❌ Erro ao ${action} PRO`, 'error');
+        showToast(`❌ Erro ao alterar plano`, 'error');
+    }
+}
+
+// Manter compatibilidade com código antigo
+async function togglePro(userId, email, activate) {
+    if (activate) {
+        // Ao ativar, chamar changePlan para escolher qual plano
+        await changePlan(userId, email);
+    } else {
+        // Ao desativar, voltar para FREE
+        if (!confirm(`Tem certeza que deseja DESATIVAR PRO para ${email}?`)) {
+            return;
+        }
+
+        try {
+            const userRef = window.firebaseDoc(window.firebaseDb, 'users', userId);
+
+            await window.firebaseUpdateDoc(userRef, {
+                plan: 'free',
+                isPro: false,
+                features: [],
+                proActivatedBy: null,
+                proActivatedAt: null
+            });
+
+            showToast(`✅ PRO desativado para ${email}!`, 'success');
+            await loadUsers();
+        } catch (error) {
+            console.error('Erro ao atualizar usuário:', error);
+            showToast(`❌ Erro ao desativar PRO`, 'error');
+        }
     }
 }
 
 window.togglePro = togglePro;
+window.changePlan = changePlan;
 
 // ========================================
 // ATIVAÇÃO EM MASSA
