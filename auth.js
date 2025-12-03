@@ -457,16 +457,16 @@ class AuthManager {
     }
 
     showLoginScreen() {
-        const loginButton = document.getElementById('googleLoginButton');
-        if (loginButton) {
-            loginButton.style.display = 'flex';
+        const loginScreen = document.getElementById('loginScreen');
+        if (loginScreen) {
+            loginScreen.style.display = 'flex';
         }
     }
 
     hideLoginScreen() {
-        const loginButton = document.getElementById('googleLoginButton');
-        if (loginButton) {
-            loginButton.style.display = 'none';
+        const loginScreen = document.getElementById('loginScreen');
+        if (loginScreen) {
+            loginScreen.style.display = 'none';
         }
     }
 
