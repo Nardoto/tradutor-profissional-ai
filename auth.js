@@ -408,28 +408,56 @@ class AuthManager {
     updateUserStatsUI() {
         // Atualizar estatísticas de uso das APIs
         const statsContainer = document.getElementById('apiUsageStats');
-        if (!statsContainer) return;
+        const visibleIndicator = document.getElementById('apiUsageVisible');
+        const apiCurrentName = document.getElementById('apiCurrentName');
+        const apiCharsUsed = document.getElementById('apiCharsUsed');
 
         // Buscar dados de uso do translator (se disponível)
         if (window.translator && window.translator.apiKeys && window.translator.apiKeys.length > 0) {
             const apiKeys = window.translator.apiKeys;
             let html = '';
+            let totalChars = 0;
+            let currentApiName = '-';
+            let currentApiChars = 0;
 
             apiKeys.forEach((api, index) => {
                 const chars = api.charsUsed || 0;
+                totalChars += chars;
                 const charsFormatted = chars.toLocaleString('pt-BR');
-                const limit = '1.5M'; // Limite aproximado gratuito do Google Gemini
                 const isActive = index === window.translator.currentKeyIndex;
                 const activeStyle = isActive ? 'color: #10b981; font-weight: 600;' : '';
+
+                if (isActive) {
+                    currentApiName = api.name;
+                    currentApiChars = chars;
+                }
 
                 html += `<div style="margin-bottom: 0.3rem; ${activeStyle}">
                     ${isActive ? '▶ ' : ''}${api.name}: <span style="color: #E85A2A;">${charsFormatted}</span> chars
                 </div>`;
             });
 
-            statsContainer.innerHTML = html;
+            if (statsContainer) {
+                statsContainer.innerHTML = html;
+            }
+
+            // Atualizar indicador visível
+            if (visibleIndicator) {
+                visibleIndicator.style.display = 'block';
+            }
+            if (apiCurrentName) {
+                apiCurrentName.textContent = currentApiName;
+            }
+            if (apiCharsUsed) {
+                apiCharsUsed.textContent = currentApiChars.toLocaleString('pt-BR');
+            }
         } else {
-            statsContainer.innerHTML = '<div style="color: #666;">Nenhuma API configurada</div>';
+            if (statsContainer) {
+                statsContainer.innerHTML = '<div style="color: #666;">Nenhuma API configurada</div>';
+            }
+            if (visibleIndicator) {
+                visibleIndicator.style.display = 'none';
+            }
         }
     }
 

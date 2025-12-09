@@ -38,6 +38,13 @@ class ProfessionalTranslator {
         // Carregar API Keys do localStorage
         this.loadApiKeys();
 
+        // Atualizar indicador de uso de API (após um pequeno delay para garantir que authManager existe)
+        setTimeout(() => {
+            if (window.authManager) {
+                window.authManager.updateUserStatsUI();
+            }
+        }, 500);
+
         // Event listeners
         document.getElementById('translateButton').addEventListener('click', () => {
             this.translate();

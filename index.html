@@ -313,6 +313,14 @@
             </button>
         </div>
 
+        <!-- API Usage Indicator (visível) -->
+        <div id="apiUsageVisible" style="display: none; text-align: right; padding: 0.5rem 0; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">
+                📊 API: <span id="apiCurrentName" style="color: #E85A2A;">-</span> |
+                <span id="apiCharsUsed" style="color: var(--text-secondary);">0</span> de <span style="color: #10b981;">1.5M</span> chars
+            </span>
+        </div>
+
         <!-- Custom Instructions Panel -->
         <div id="customInstructionsPanel" style="display: none; background: var(--bg-secondary); padding: 1rem 1.5rem; border-radius: var(--radius-sm); margin-bottom: 1rem; border: 1px solid rgba(232, 90, 42, 0.25);">
             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
@@ -370,7 +378,7 @@
                     <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
                         ⚡ Caracteres por segundo:
                     </label>
-                    <input type="number" id="srtReadingRate" value="14" min="10" max="25" step="1"
+                    <input type="number" id="srtReadingRate" value="10" min="10" max="25" step="1"
                            style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: var(--radius-sm);">
                     <small style="color: var(--text-secondary); font-size: 0.8rem;">Recomendado: 14-17 c/s</small>
                 </div>
@@ -383,14 +391,14 @@
                     </p>
                 </div>
 
-                <div style="padding: 0.75rem; background: #d4edda; border-radius: var(--radius-sm); border-left: 3px solid #28a745;">
-                    <p style="margin: 0; font-size: 0.85rem; color: #155724;">
+                <div style="padding: 0.75rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%); border-radius: var(--radius-sm); border-left: 3px solid #10b981;">
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
                         <strong>🎯 Fluxo recomendado:</strong> Escreva seu roteiro em português → Traduza para o idioma desejado → Exporte em SRT → Importe a legenda no seu editor de vídeo ou YouTube!
                     </p>
                 </div>
 
-                <div style="padding: 0.75rem; background: #fff3cd; border-radius: var(--radius-sm); border-left: 3px solid #ffc107;">
-                    <p style="margin: 0; font-size: 0.85rem; color: #856404;">
+                <div style="padding: 0.75rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%); border-radius: var(--radius-sm); border-left: 3px solid #f59e0b;">
+                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
                         <strong>⚙️ Personalização:</strong> Ajuste os parâmetros acima para controlar o tamanho das legendas e velocidade de exibição. Valores maiores = legendas mais longas, valores menores = legendas mais curtas e rápidas.
                     </p>
                 </div>
