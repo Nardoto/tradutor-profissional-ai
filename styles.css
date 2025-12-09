@@ -964,6 +964,11 @@ textarea:focus {
     background: #17a2b8;
 }
 
+.toast.warning {
+    background: #f59e0b;
+    color: #000;
+}
+
 /* ========================================
    MODAL
    ======================================== */
