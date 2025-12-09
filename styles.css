@@ -941,7 +941,7 @@ textarea:focus {
     box-shadow: var(--shadow-lg);
     transform: translateY(150%);
     transition: transform 0.3s ease;
-    z-index: 2000;
+    z-index: 5000;
     display: flex;
     align-items: center;
     gap: 0.75rem;
