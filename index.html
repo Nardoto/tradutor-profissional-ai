@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Tradutor Profissional - Powered by Google Gemini AI">
-    <title>Tradutor Profissional - v3.0.0</title>
-    <link rel="stylesheet" href="styles.css?v=2.8.6">
+    <title>Tradutor Profissional AI</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="stylesheet" href="styles.css?v=5.1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         .translator-container {
             max-width: 1400px;
@@ -18,16 +20,17 @@
 
         .translator-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .translator-header h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .translator-grid {
@@ -82,18 +85,20 @@
         }
 
         textarea[readonly] {
-            background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%);
-            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(232, 90, 42, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+            border-color: #E85A2A;
         }
 
         .controls {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             align-items: center;
-            padding: 1.5rem;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-sm);
-            margin-bottom: 2rem;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(180deg, rgba(26, 26, 26, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%);
+            border-radius: 14px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .stats-panel {
@@ -111,8 +116,8 @@
         }
 
         .stats-box.translated {
-            background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%);
-            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(232, 90, 42, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+            border-color: #E85A2A;
         }
 
         .stats-grid {
@@ -139,7 +144,7 @@
         }
 
         .stat-value.translated {
-            color: #667eea;
+            color: #E85A2A;
         }
 
         .stat-diff {
@@ -171,55 +176,56 @@
     <!-- Main Content -->
     <div class="translator-container">
         <div class="translator-header">
-            <!-- Header com título e perfil -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <!-- Header compacto com título e perfil -->
+            <div style="display: flex; justify-content: space-between; align-items: center; height: 40px; margin-bottom: 0.5rem;">
                 <div style="flex: 1;"></div>
 
-                <!-- Título centralizado -->
-                <div style="flex: 1; text-align: center;">
-                    <h1 style="margin: 0; font-size: 1.5rem;">🌐 Tradutor Profissional AI</h1>
+                <!-- Título centralizado com Logo -->
+                <div style="flex: 2; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <img src="favicon.png" alt="Nardoto" style="width: 28px; height: 28px; border-radius: 6px;">
+                    <h1 style="margin: 0; font-size: 1.3rem; font-family: 'DM Serif Display', serif;">Tradutor Profissional AI</h1>
                 </div>
 
-                <!-- Perfil do Usuário no canto direito -->
+                <!-- Perfil do Usuário compacto -->
                 <div style="flex: 1; display: flex; justify-content: flex-end;">
-                    <div id="userProfileButton" style="cursor: pointer; background: white; border: 2px solid var(--border-color); border-radius: 50px; padding: 0.5rem 1rem; display: none; gap: 0.75rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <img id="userAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                    <div id="userProfileButton" style="cursor: pointer; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.15); border-radius: 25px; padding: 0.35rem 0.75rem; display: none; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <img id="userAvatar" src="" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
                         <div style="text-align: left;">
-                            <div id="userName" style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);"></div>
-                            <div id="userPlan" style="font-size: 0.75rem; color: var(--text-secondary);"></div>
+                            <div id="userName" style="font-weight: 600; font-size: 0.75rem; color: #fff; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></div>
+                            <div id="userPlan" style="font-size: 0.65rem; color: #E85A2A; font-weight: 600;"></div>
                         </div>
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#9CA3AF" stroke-width="2">
                             <path d="M4 6l4 4 4-4"/>
                         </svg>
                     </div>
                 </div>
             </div>
 
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.25rem 0 1.5rem 0; text-align: center;">Desenvolvido por <strong>Nardoto</strong> | Powered by Google Gemini AI</p>
+            <p style="color: var(--text-secondary); font-size: 0.75rem; margin: 0 0 0.75rem 0; text-align: center;">Desenvolvido por <strong style="color: #E85A2A;">Nardoto</strong> | Powered by Google Gemini AI</p>
         </div>
 
         <!-- Menu Dropdown do Usuário -->
-        <div id="userDropdownMenu" style="display: none; position: absolute; top: 5rem; right: 2rem; background: white; border: 2px solid var(--border-color); border-radius: var(--radius-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.15); min-width: 280px; z-index: 1000;">
-            <div style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
-                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Uso de Hoje</div>
+        <div id="userDropdownMenu" style="display: none; position: absolute; top: 5rem; right: 2rem; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 260px; z-index: 1000;">
+            <div style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; font-size: 0.9rem;">Uso de Hoje</div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <div style="flex: 1; height: 8px; background: var(--bg-hover); border-radius: 10px; overflow: hidden;">
-                        <div id="usageBar" style="height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 0%; transition: width 0.3s;"></div>
+                    <div style="flex: 1; height: 6px; background: #252525; border-radius: 10px; overflow: hidden;">
+                        <div id="usageBar" style="height: 100%; background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%); width: 0%; transition: width 0.3s;"></div>
                     </div>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                    <span id="translationsUsed" style="font-weight: 600; color: var(--accent-primary);">0</span> / 50 traduções
+                <div style="font-size: 0.8rem; color: #9CA3AF;">
+                    <span id="translationsUsed" style="font-weight: 600; color: #E85A2A;">0</span> / 50 traduções
                 </div>
             </div>
 
-            <div style="padding: 0.5rem;">
-                <button id="freeTrialButton" class="btn-success" style="width: 100%; margin-bottom: 0.5rem; justify-content: center; display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <div style="padding: 0.75rem;">
+                <button id="freeTrialButton" class="btn-success" style="width: 100%; margin-bottom: 0.5rem; justify-content: center; display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.85rem; padding: 0.6rem;">
                     🎁 Testar Grátis 3 Dias
                 </button>
-                <button id="upgradeButton" class="btn-primary" style="width: 100%; margin-bottom: 0.5rem; justify-content: center;">
+                <button id="upgradeButton" class="btn-primary" style="width: 100%; margin-bottom: 0.5rem; justify-content: center; background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%); font-size: 0.85rem; padding: 0.6rem;">
                     ⭐ Upgrade para PRO
                 </button>
-                <button id="logoutButton" class="btn-secondary" style="width: 100%; justify-content: center;">
+                <button id="logoutButton" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
                     🚪 Sair
                 </button>
             </div>
@@ -229,32 +235,39 @@
 
         <!-- Controls -->
         <div class="controls">
-            <select id="sourceLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 250px;">
-                <option value="auto">🔄 Detectar automaticamente</option>
-                <option value="portuguese">🇧🇷 Português</option>
-                <option value="english">🇺🇸 Inglês</option>
-                <option value="spanish">🇪🇸 Espanhol</option>
-                <option value="french">🇫🇷 Francês</option>
-                <option value="italian">🇮🇹 Italiano</option>
-                <option value="german">🇩🇪 Alemão</option>
+            <select id="sourceLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 200px;">
+                <option value="auto">Auto-detectar</option>
+                <option value="portuguese">Português</option>
+                <option value="english">Inglês</option>
+                <option value="spanish">Espanhol</option>
+                <option value="french">Francês</option>
+                <option value="italian">Italiano</option>
+                <option value="german">Alemão</option>
             </select>
 
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E85A2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
 
-            <select id="targetLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 250px;">
-                <option value="" disabled selected>Idioma de destino...</option>
-                <option value="english">🇺🇸 Inglês</option>
-                <option value="portuguese">🇧🇷 Português</option>
-                <option value="spanish">🇪🇸 Espanhol</option>
-                <option value="french">🇫🇷 Francês</option>
-                <option value="italian">🇮🇹 Italiano</option>
-                <option value="german">🇩🇪 Alemão</option>
+            <select id="targetLangSelector" class="root-folder-dropdown" style="flex: 1; max-width: 200px;">
+                <option value="" disabled selected>Destino...</option>
+                <option value="english">Inglês</option>
+                <option value="portuguese">Português</option>
+                <option value="spanish">Espanhol</option>
+                <option value="french">Francês</option>
+                <option value="italian">Italiano</option>
+                <option value="german">Alemão</option>
             </select>
 
-            <button id="translateButton" class="btn-primary" style="padding: 0 2.5rem;">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-right: 0.5rem;">
+            <select id="translationTypeSelector" class="root-folder-dropdown" style="flex: 1; max-width: 200px;">
+                <option value="literal">Literal</option>
+                <option value="cultural">Cultural</option>
+            </select>
+
+            <!-- Botão TRADUZIR - Destaque principal estilo Nardoto -->
+            <button id="translateButton" class="btn-translate-main">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10 2C14.418 2 18 5.582 18 10C18 14.418 14.418 18 10 18C5.582 18 2 14.418 2 10C2 5.582 5.582 2 10 2Z" stroke="currentColor" stroke-width="2"/>
                     <path d="M7 10L10 7L13 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M10 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -262,29 +275,86 @@
                 Traduzir
             </button>
 
-            <button id="exportButton" class="btn-secondary" style="display: none;" title="Exportar tradução como arquivo de texto (.txt)">
-                💾 Exportar TXT
-            </button>
-
-            <button id="exportSrtButton" class="btn-secondary" style="display: none;" title="Exportar como legenda com timestamps para vídeos (.srt)">
-                🎬 Exportar SRT (Legenda)
-            </button>
-
-            <button id="clearButton" class="btn-secondary">
-                🗑️ Limpar
-            </button>
-
-            <button id="settingsButton" class="btn-primary" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="2"/>
-                    <path d="M16.2 12.5L15.4 13.9C15.1 14.5 15.2 15.2 15.7 15.7L16.3 16.3C16.5 16.5 16.5 16.8 16.3 17L17 17.7C17.2 17.9 17.5 17.9 17.7 17.7L18.3 17.1C18.8 16.6 19.5 16.5 20.1 16.8L21.5 17.6C21.8 17.8 22 18.1 22 18.5V19.5C22 19.8 21.8 20 21.5 20H18.5C18.2 20 18 19.8 18 19.5V18.5C18 18.1 17.8 17.8 17.5 17.6L16.1 16.8C15.5 16.5 14.8 16.6 14.3 17.1L13.7 17.7C13.5 17.9 13.2 17.9 13 17.7L12.3 17C12.1 16.8 12.1 16.5 12.3 16.3L12.9 15.7C13.4 15.2 13.5 14.5 13.2 13.9L12.4 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <button id="exportButton" class="btn-ghost with-text" style="display: none;" title="Exportar tradução como arquivo de texto (.txt)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
-                Configurar API Key
+                TXT
             </button>
 
-            <button id="helpButton" class="btn-secondary" style="padding: 0.5rem 0.75rem; min-width: auto;" title="Como usar">
-                ❓
+            <button id="exportSrtButton" class="btn-ghost with-text" style="display: none;" title="Exportar como legenda com timestamps para vídeos (.srt)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
+                    <line x1="7" y1="2" x2="7" y2="22"/>
+                    <line x1="17" y1="2" x2="17" y2="22"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <line x1="2" y1="7" x2="7" y2="7"/>
+                    <line x1="2" y1="17" x2="7" y2="17"/>
+                    <line x1="17" y1="17" x2="22" y2="17"/>
+                    <line x1="17" y1="7" x2="22" y2="7"/>
+                </svg>
+                SRT
             </button>
+
+            <!-- Botão Limpar - Discreto -->
+            <button id="clearButton" class="btn-ghost" title="Limpar campos">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+            </button>
+
+            <!-- Botão Configurar API - Discreto -->
+            <button id="settingsButton" class="btn-ghost with-text" title="Configurar API Key">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                </svg>
+                API
+            </button>
+
+            <!-- Botão Help - Abre modal de ajuda -->
+            <button id="helpButton" class="btn-ghost" title="Como usar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Custom Instructions Panel -->
+        <div id="customInstructionsPanel" style="display: none; background: var(--bg-secondary); padding: 1rem 1.5rem; border-radius: var(--radius-sm); margin-bottom: 1rem; border: 1px solid rgba(232, 90, 42, 0.25);">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E85A2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <h4 style="color: #E85A2A; margin: 0; font-size: 0.95rem; font-weight: 600;">Instruções de Localização Cultural</h4>
+                <button id="toggleInstructionsBtn" class="btn-ghost with-text" style="margin-left: auto; padding: 0.4rem 0.8rem; font-size: 0.75rem; height: 32px; min-width: auto;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                    Expandir
+                </button>
+            </div>
+            <div id="instructionsContent" style="display: none;">
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 0.75rem 0;">
+                    Descreva adaptações específicas que deseja (ex: "PIX → Venmo", "gírias BR → gírias americanas", "referências culturais locais")
+                </p>
+                <textarea
+                    id="customInstructions"
+                    placeholder="Exemplos:&#10;- Substituir PIX por Venmo ou PayPal&#10;- Adaptar gírias brasileiras para equivalentes americanos&#10;- Converter medidas (km → milhas, kg → libras)&#10;- Substituir referências a programas de TV brasileiros por americanos"
+                    style="width: 100%; min-height: 100px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.9rem; resize: vertical; background: var(--bg-primary); color: var(--text-primary);"
+                ></textarea>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn-secondary quick-instruction" data-instruction="Substituir PIX por Venmo/PayPal" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">PIX → Venmo</button>
+                    <button class="btn-secondary quick-instruction" data-instruction="Adaptar gírias e expressões coloquiais para equivalentes naturais no idioma de destino" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Gírias</button>
+                    <button class="btn-secondary quick-instruction" data-instruction="Converter unidades de medida (km→milhas, kg→libras, °C→°F)" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Medidas</button>
+                    <button class="btn-secondary quick-instruction" data-instruction="Adaptar referências culturais (programas de TV, celebridades, marcas) para equivalentes locais" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Cultura</button>
+                </div>
+            </div>
         </div>
 
         <!-- SRT Settings Panel (oculto por padrão) -->
@@ -318,7 +388,7 @@
             </div>
 
             <div style="margin-top: 1.5rem; display: grid; gap: 0.75rem;">
-                <div style="padding: 0.75rem; background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%); border-radius: var(--radius-sm); border-left: 3px solid var(--accent-primary);">
+                <div style="padding: 0.75rem; background: linear-gradient(135deg, rgba(232, 90, 42, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%); border-radius: var(--radius-sm); border-left: 3px solid #E85A2A;">
                     <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
                         <strong>💡 Como funciona:</strong> A tradução será automaticamente dividida em blocos de legenda com timestamps calculados pela velocidade de leitura. Perfeito para criar legendas em vídeos do YouTube, Vimeo ou qualquer player que suporte SRT!
                     </p>
@@ -353,14 +423,18 @@
                     <textarea id="originalText" placeholder="Cole aqui o texto que deseja traduzir..."></textarea>
                     <div class="char-counter" id="originalCounter">0 caracteres</div>
                 </div>
-                <button id="copyOriginalButton" class="btn-secondary" style="width: 100%;">
-                    📋 Copiar Original
+                <button id="copyOriginalButton" class="btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    Copiar Original
                 </button>
             </div>
 
             <!-- Translated Text -->
             <div class="text-panel">
-                <h3 style="color: #667eea; display: flex; align-items: center; gap: 0.5rem;">
+                <h3 style="color: #E85A2A; display: flex; align-items: center; gap: 0.5rem;">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                         <path d="M10 2C14.418 2 18 5.582 18 10C18 14.418 14.418 18 10 18C5.582 18 2 14.418 2 10C2 5.582 5.582 2 10 2Z" stroke="currentColor" stroke-width="2"/>
                     </svg>
@@ -370,8 +444,12 @@
                     <textarea id="translatedText" readonly placeholder="A tradução aparecerá aqui..."></textarea>
                     <div class="char-counter" id="translatedCounter">0 caracteres</div>
                 </div>
-                <button id="copyTranslatedButton" class="btn-primary" style="width: 100%;">
-                    📋 Copiar Tradução
+                <button id="copyTranslatedButton" class="btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    Copiar Tradução
                 </button>
             </div>
         </div>
@@ -379,7 +457,16 @@
         <!-- Statistics -->
         <div class="stats-panel" id="statsPanel" style="display: none;">
             <div class="stats-box">
-                <h4 style="color: var(--accent-primary); margin: 0 0 1rem 0;">📝 Texto Original</h4>
+                <h4 style="color: var(--accent-primary); margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    Texto Original
+                </h4>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-label">Palavras</div>
@@ -393,7 +480,14 @@
             </div>
 
             <div class="stats-box translated">
-                <h4 style="color: #667eea; margin: 0 0 1rem 0;">🌐 Tradução</h4>
+                <h4 style="color: #E85A2A; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    Tradução
+                </h4>
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-label">Palavras</div>
@@ -416,16 +510,25 @@
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 600px; background: #1a1a1a; border: 1px solid #333;">
-            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <h2 style="color: white;">⚙️ Configurações</h2>
+        <div class="modal-content" style="max-width: 600px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%);">
+                <h2 style="color: white; font-family: 'DM Serif Display', serif; display: flex; align-items: center; gap: 0.75rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    Configurações
+                </h2>
                 <button class="modal-close" onclick="document.getElementById('settingsModal').style.display='none'" style="color: white;">&times;</button>
             </div>
             <div class="modal-body" style="background: #1a1a1a;">
                 <!-- Configuração de API Key -->
                 <div style="margin-bottom: 1.5rem;">
-                    <h3 style="color: #667eea; margin: 0 0 1rem 0; font-size: 1.1rem;">
-                        🔑 API Key do Google Gemini
+                    <h3 style="color: #E85A2A; margin: 0 0 1rem 0; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                        </svg>
+                        API Key do Google Gemini
                     </h3>
 
                     <div style="margin-bottom: 1rem;">
@@ -438,58 +541,106 @@
                     </div>
 
                     <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
-                        <button id="saveApiKeyButton" class="btn-primary" style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 0.75rem; border-radius: 6px; cursor: pointer;">
-                            💾 Salvar
+                        <button id="saveApiKeyButton" class="btn-primary" style="flex: 1; background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%); border: none; color: white; padding: 0.75rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/>
+                                <polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                            Salvar
                         </button>
-                        <button id="testApiKeyButton" class="btn-secondary" style="flex: 1; background: #252525; border: 2px solid #333; color: #fff; padding: 0.75rem; border-radius: 6px; cursor: pointer;">
-                            🧪 Testar
+                        <button id="testApiKeyButton" class="btn-secondary" style="flex: 1; background: #252525; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.75rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                            Testar
                         </button>
                     </div>
 
-                    <details style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%); border-left: 3px solid #667eea; border-radius: 6px; cursor: pointer;">
-                        <summary style="list-style: none; font-weight: 600; color: #667eea; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; user-select: none;">
+                    <!-- Lista de API Keys cadastradas -->
+                    <div id="apiKeysList" style="margin-bottom: 1rem;"></div>
+
+                    <details style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(232, 90, 42, 0.15) 0%, rgba(255, 107, 53, 0.05) 100%); border-left: 3px solid #E85A2A; border-radius: 6px; cursor: pointer;">
+                        <summary style="list-style: none; font-weight: 600; color: #E85A2A; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; user-select: none;">
                             <span style="transition: transform 0.2s;">▶</span>
-                            📚 Como obter sua API Key GRATUITA
+                            Como obter sua API Key GRATUITA
                         </summary>
 
-                        <div style="background: #252525; padding: 1rem; border-radius: 6px; margin: 1rem 0 1rem 0; border: 1px solid #333;">
-                            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: #a0a0a0; line-height: 2;">
-                                <li style="margin-bottom: 0.5rem;">
-                                    <strong style="color: #fff;">Acesse o <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: #667eea; text-decoration: underline;">Google AI Studio</a></strong>
+                        <!-- PARTE 1: Criar a chave -->
+                        <div style="background: #252525; padding: 1rem; border-radius: 6px; margin: 1rem 0 0.75rem 0; border: 1px solid #333;">
+                            <p style="color: #E85A2A; font-weight: 600; margin: 0 0 0.75rem 0; font-size: 0.9rem;">Parte 1: Criar a API Key</p>
+                            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: #a0a0a0; line-height: 1.9;">
+                                <li style="margin-bottom: 0.4rem;">
+                                    Acesse o <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #E85A2A; text-decoration: underline; font-weight: 600;">Google AI Studio</a>
                                 </li>
-                                <li style="margin-bottom: 0.5rem;">
+                                <li style="margin-bottom: 0.4rem;">
                                     Faça login com sua <strong style="color: #fff;">conta Google</strong>
                                 </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Aceite os termos <strong style="color: #fff;">"Como um desenvolvedor"</strong> e clique em <strong style="color: #fff;">"Continuar"</strong>
+                                <li style="margin-bottom: 0.4rem;">
+                                    Aceite os termos e clique em <strong style="color: #fff;">"Continuar"</strong>
                                 </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    No canto superior direito, clique em <strong style="color: #fff;">"Criar chave de API"</strong> (botão verde)
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Dê um nome para sua chave (ex: <code style="background: #333; padding: 0.2rem 0.4rem; border-radius: 3px; font-family: 'Courier New', monospace; color: #667eea;">"tradutor"</code>)
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Escolha <strong style="color: #fff;">"Default Gemini Project"</strong>
-                                </li>
-                                <li style="margin-bottom: 0.5rem;">
-                                    Clique no <strong style="color: #fff;">ícone de copiar</strong> ao lado da chave gerada
+                                <li style="margin-bottom: 0.4rem;">
+                                    Clique em <strong style="color: #fff;">"Criar chave de API"</strong>
                                 </li>
                                 <li>
-                                    <strong style="color: #fff;">Cole a chave</strong> no campo acima e clique em "Salvar"
+                                    Dê um nome (ex: "tradutor") e clique em <strong style="color: #fff;">"Criar chave"</strong>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <!-- PARTE 2: Vincular faturamento -->
+                        <div style="background: #ef444422; padding: 1rem; border-radius: 6px; margin-bottom: 0.75rem; border: 1px solid #ef4444;">
+                            <p style="color: #ef4444; font-weight: 600; margin: 0 0 0.75rem 0; font-size: 0.9rem;">⚠️ Parte 2: Vincular Faturamento (obrigatório)</p>
+                            <p style="color: #fca5a5; font-size: 0.8rem; margin: 0 0 0.75rem 0;">
+                                O Google agora exige uma conta de faturamento vinculada, mesmo para uso gratuito. <strong style="color: #fff;">Não será cobrado nada</strong> - apenas cadastre um cartão para verificação.
+                            </p>
+                            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: #a0a0a0; line-height: 1.9;">
+                                <li style="margin-bottom: 0.4rem;">
+                                    Na página das chaves, clique em <strong style="color: #fff;">"Configurar faturamento"</strong>
+                                </li>
+                                <li style="margin-bottom: 0.4rem;">
+                                    Clique em <strong style="color: #fff;">"Vincular conta de faturamento"</strong>
+                                </li>
+                                <li style="margin-bottom: 0.4rem;">
+                                    Clique em <strong style="color: #fff;">"Gerenciar contas de faturamento"</strong>
+                                </li>
+                                <li style="margin-bottom: 0.4rem;">
+                                    Clique em <strong style="color: #fff;">"+ Criar conta"</strong>
+                                </li>
+                                <li style="margin-bottom: 0.4rem;">
+                                    Preencha nome e país, clique em <strong style="color: #fff;">"Continuar"</strong>
+                                </li>
+                                <li>
+                                    Cadastre um cartão (pode ser <strong style="color: #fff;">pré-pago com R$1</strong>) e clique em <strong style="color: #fff;">"Enviar e ativar"</strong>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <!-- PARTE 3: Copiar e usar -->
+                        <div style="background: #252525; padding: 1rem; border-radius: 6px; margin-bottom: 0.75rem; border: 1px solid #333;">
+                            <p style="color: #10b981; font-weight: 600; margin: 0 0 0.75rem 0; font-size: 0.9rem;">Parte 3: Usar a Chave</p>
+                            <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem; color: #a0a0a0; line-height: 1.9;">
+                                <li style="margin-bottom: 0.4rem;">
+                                    Volte para <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #E85A2A; text-decoration: underline;">Chaves de API</a>
+                                </li>
+                                <li style="margin-bottom: 0.4rem;">
+                                    Clique no <strong style="color: #fff;">ícone de copiar</strong> ao lado da sua chave
+                                </li>
+                                <li>
+                                    <strong style="color: #fff;">Cole aqui</strong> no campo acima e clique em "Salvar"
                                 </li>
                             </ol>
                         </div>
 
                         <div style="background: #10b98122; border: 1px solid #10b981; padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 0.75rem;">
                             <p style="margin: 0; color: #10b981; font-size: 0.85rem; font-weight: 500;">
-                                ✅ <strong>100% GRATUITO!</strong> Sem necessidade de cartão de crédito.
+                                ✓ <strong>100% GRATUITO!</strong> O cartão é apenas para verificação. A API Gemini tem tier gratuito generoso!
                             </p>
                         </div>
 
                         <div style="background: #f59e0b22; border: 1px solid #f59e0b; padding: 0.75rem 1rem; border-radius: 6px;">
                             <p style="margin: 0; color: #f59e0b; font-size: 0.8rem;">
-                                <strong>💡 Dica:</strong> Essa chave permite traduzir arquivos inteiros de uma só vez usando o poder da IA Google Gemini!
+                                <strong>Dica:</strong> Use um cartão pré-pago com limite baixo (R$1) para maior segurança. Você pode adicionar várias API Keys - quando uma atingir o limite, o sistema usa a próxima!
                             </p>
                         </div>
                     </details>
@@ -502,23 +653,88 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 550px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%);">
+                <h2 style="color: white; font-family: 'DM Serif Display', serif; display: flex; align-items: center; gap: 0.75rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    Como Usar
+                </h2>
+                <button class="modal-close" onclick="document.getElementById('helpModal').style.display='none'" style="color: white;">&times;</button>
+            </div>
+            <div class="modal-body" style="background: #1a1a1a; color: #fff;">
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="color: #E85A2A; margin: 0 0 0.75rem 0; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                        Passo a Passo
+                    </h3>
+                    <ol style="margin: 0; padding-left: 1.5rem; color: #9CA3AF; font-size: 0.9rem; line-height: 1.8;">
+                        <li><strong style="color: #fff;">Configure sua API Key</strong> - Clique em API e adicione sua chave gratuita do Google Gemini</li>
+                        <li><strong style="color: #fff;">Selecione os idiomas</strong> - Origem (ou auto-detectar) e destino</li>
+                        <li><strong style="color: #fff;">Escolha o tipo de tradução</strong> - Literal ou Localização Cultural</li>
+                        <li><strong style="color: #fff;">Cole seu texto</strong> e clique no botão <strong style="color: #E85A2A;">Traduzir</strong></li>
+                        <li><strong style="color: #fff;">Exporte</strong> como TXT ou SRT (legendas)</li>
+                    </ol>
+                </div>
+
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: linear-gradient(135deg, rgba(232, 90, 42, 0.15) 0%, rgba(255, 107, 53, 0.05) 100%); border-radius: 10px; border-left: 3px solid #E85A2A;">
+                    <h4 style="color: #E85A2A; margin: 0 0 0.5rem 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                        Localização Cultural
+                    </h4>
+                    <p style="margin: 0; color: #9CA3AF; font-size: 0.85rem; line-height: 1.6;">
+                        Adapta gírias, referências culturais, sistemas de pagamento (PIX → Venmo), medidas e expressões para o público-alvo. Ideal para marketing e conteúdo!
+                    </p>
+                </div>
+
+                <div style="padding: 1rem; background: #252525; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h4 style="color: #10b981; margin: 0 0 0.5rem 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        Dicas
+                    </h4>
+                    <ul style="margin: 0; padding-left: 1.25rem; color: #9CA3AF; font-size: 0.85rem; line-height: 1.7;">
+                        <li>Adicione múltiplas API Keys para evitar limites</li>
+                        <li>Use SRT para criar legendas de vídeos</li>
+                        <li>Textos grandes são divididos automaticamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Login Screen -->
-    <div id="loginScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #2d2d44 100%); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-        <div style="background: #1a1a1a; border: 1px solid #333; border-radius: var(--radius-md); padding: 3rem; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
-                    🌐 Tradutor Profissional AI
+    <div id="loginScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 2.5rem; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <img src="favicon.png" alt="Nardoto" style="width: 64px; height: 64px; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 8px 32px rgba(232, 90, 42, 0.3);">
+                <h1 style="font-size: 1.75rem; font-family: 'DM Serif Display', serif; background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
+                    Tradutor Profissional AI
                 </h1>
-                <p style="color: #a0a0a0; font-size: 0.95rem;">
+                <p style="color: #9CA3AF; font-size: 0.9rem;">
                     Faça login para começar a traduzir
                 </p>
             </div>
 
-            <div style="background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 2rem; border: 1px solid #333;">
-                <h3 style="color: #667eea; margin: 0 0 1rem 0; font-size: 1rem; text-align: center;">
+            <div style="background: linear-gradient(135deg, rgba(232, 90, 42, 0.15) 0%, rgba(255, 107, 53, 0.05) 100%); padding: 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; border: 1px solid rgba(232, 90, 42, 0.3);">
+                <h3 style="color: #E85A2A; margin: 0 0 0.75rem 0; font-size: 0.95rem; text-align: center;">
                     ✨ Plano GRATUITO Inclui:
                 </h3>
-                <ul style="margin: 0; padding-left: 1.5rem; color: #a0a0a0; font-size: 0.9rem; line-height: 1.8;">
+                <ul style="margin: 0; padding-left: 1.25rem; color: #9CA3AF; font-size: 0.85rem; line-height: 1.7;">
                     <li><strong style="color: #fff;">50 traduções por dia</strong> com IA Google Gemini</li>
                     <li><strong style="color: #fff;">Exportar TXT e SRT</strong> (legendas para vídeos)</li>
                     <li><strong style="color: #fff;">Auto-detectar idiomas</strong> automaticamente</li>
@@ -526,8 +742,8 @@
                 </ul>
             </div>
 
-            <button id="googleLoginButton" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; border-radius: 8px; cursor: pointer;">
-                <svg width="24" height="24" viewBox="0 0 24 24">
+            <button id="googleLoginButton" class="btn-primary" style="width: 100%; padding: 0.9rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem; background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%); border: none; color: white; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 32px rgba(232, 90, 42, 0.3);">
+                <svg width="20" height="20" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -536,7 +752,7 @@
                 Entrar com Google
             </button>
 
-            <p style="text-align: center; color: #666; font-size: 0.85rem; margin: 1.5rem 0 0 0;">
+            <p style="text-align: center; color: #6B7280; font-size: 0.8rem; margin: 1rem 0 0 0;">
                 Ao fazer login, você concorda com nossos termos de uso
             </p>
         </div>
@@ -597,21 +813,31 @@
         console.log('🔥 Firebase initialized');
     </script>
 
-    <!-- Help Toggle Function -->
+    <!-- Help Modal Function -->
     <script>
-        function toggleHelp() {
-            const helpPanel = document.getElementById('helpPanel');
-            if (helpPanel.style.display === 'none') {
-                helpPanel.style.display = 'block';
-            } else {
-                helpPanel.style.display = 'none';
+        // Botão Help - Abre modal de ajuda
+        document.addEventListener('DOMContentLoaded', function() {
+            const helpButton = document.getElementById('helpButton');
+            const helpModal = document.getElementById('helpModal');
+
+            if (helpButton && helpModal) {
+                helpButton.addEventListener('click', function() {
+                    helpModal.style.display = 'block';
+                });
+
+                // Fechar modal ao clicar fora
+                helpModal.addEventListener('click', function(e) {
+                    if (e.target === helpModal) {
+                        helpModal.style.display = 'none';
+                    }
+                });
             }
-        }
+        });
     </script>
 
     <!-- Scripts -->
-    <script src="auth.js?v=3.8.0"></script>
-    <script src="translator.js?v=3.0.0"></script>
+    <script src="auth.js?v=4.2.0"></script>
+    <script src="translator.js?v=4.2.0"></script>
     <script src="payment.js?v=1.0.0"></script>
 </body>
 </html>

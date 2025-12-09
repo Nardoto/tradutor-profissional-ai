@@ -1,13 +1,13 @@
 // ========================================
 // TRADUTOR PROFISSIONAL AI
 // Professional Translation Tool
-// Version: 3.0.0 - Sistema de Autenticação Firebase + Controle de Uso
+// Version: 3.2.0 - Multi API Keys + Instruções Atualizadas
 // Desenvolvido por: Nardoto
 // ========================================
 
 class ProfessionalTranslator {
     constructor() {
-        console.log('🌐 Tradutor Profissional AI v3.0.0 - by Nardoto');
+        console.log('🌐 Tradutor Profissional AI v3.2.0 - Multi API Keys - by Nardoto');
 
         // Sistema de múltiplas API Keys
         this.apiKeys = []; // Array de {key: string, name: string, active: boolean}
@@ -18,6 +18,8 @@ class ProfessionalTranslator {
         this.originalText = '';
         this.sourceLang = '';
         this.targetLang = '';
+        this.translationType = 'literal'; // 'literal' ou 'cultural'
+        this.customInstructions = '';
 
         // Configuração de chunks para textos grandes
         this.MAX_CHARS_PER_CHUNK = 25000; // ~6.000-7.000 tokens seguros
@@ -90,6 +92,43 @@ class ProfessionalTranslator {
 
         document.getElementById('targetLangSelector').addEventListener('change', (e) => {
             this.updateTranslatedLabel(e.target.value);
+        });
+
+        // Tipo de tradução (Literal vs Cultural)
+        document.getElementById('translationTypeSelector').addEventListener('change', (e) => {
+            this.translationType = e.target.value;
+            const panel = document.getElementById('customInstructionsPanel');
+            if (e.target.value === 'cultural') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        });
+
+        // Toggle instruções expandir/colapsar
+        document.getElementById('toggleInstructionsBtn').addEventListener('click', () => {
+            const content = document.getElementById('instructionsContent');
+            const btn = document.getElementById('toggleInstructionsBtn');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.textContent = '▲ Colapsar';
+            } else {
+                content.style.display = 'none';
+                btn.textContent = '▼ Expandir';
+            }
+        });
+
+        // Botões de instrução rápida
+        document.querySelectorAll('.quick-instruction').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const textarea = document.getElementById('customInstructions');
+                const instruction = e.target.dataset.instruction;
+                if (textarea.value) {
+                    textarea.value += '\n- ' + instruction;
+                } else {
+                    textarea.value = '- ' + instruction;
+                }
+            });
         });
 
         // Fechar modal ao clicar fora
@@ -393,6 +432,8 @@ class ProfessionalTranslator {
         this.sourceLang = languageMap[sourceLangSelector.value];
         this.targetLang = languageMap[targetLangSelector.value];
         this.originalText = originalText;
+        this.translationType = document.getElementById('translationTypeSelector').value;
+        this.customInstructions = document.getElementById('customInstructions').value.trim();
 
         // Atualizar UI
         this.isTranslating = true;
@@ -584,7 +625,53 @@ class ProfessionalTranslator {
      * Traduz um único chunk com rotação automática de API Keys
      */
     async translateChunk(chunk, sourceLanguageText, targetLang) {
-        const prompt = `Você é um tradutor profissional especializado.
+        // Construir prompt baseado no tipo de tradução
+        let prompt;
+
+        if (this.translationType === 'cultural') {
+            // Prompt para Localização Cultural
+            prompt = `Você é um especialista em LOCALIZAÇÃO CULTURAL e adaptação de conteúdo para diferentes mercados.
+
+TAREFA: ${sourceLanguageText} LOCALIZE o texto abaixo para ${targetLang}, adaptando-o CULTURALMENTE para que faça sentido natural para o público-alvo.
+
+🌍 LOCALIZAÇÃO CULTURAL - O QUE FAZER:
+1. ADAPTAR REFERÊNCIAS CULTURAIS:
+   - Substitua gírias, expressões e ditados populares por equivalentes NATURAIS no idioma de destino
+   - Adapte referências a programas de TV, celebridades, marcas para equivalentes locais quando apropriado
+   - Mantenha o IMPACTO EMOCIONAL e humorístico das expressões originais
+
+2. ADAPTAR CONTEXTOS ESPECÍFICOS:
+   - Sistemas de pagamento: PIX → Venmo/PayPal/Zelle (EUA), Bizum (Espanha), etc.
+   - Moedas: Adapte valores quando fizer sentido para a economia local
+   - Medidas: Considere converter km→milhas, kg→libras, °C→°F se for para público americano
+   - Datas: Adapte formato se necessário (DD/MM → MM/DD)
+
+3. MANTER A ESSÊNCIA:
+   - Preserve o TOM e a INTENÇÃO do texto original
+   - Mantenha a força persuasiva e emocional
+   - O texto deve parecer que foi ESCRITO ORIGINALMENTE no idioma de destino
+
+4. ESTRUTURA:
+   - Mantenha TODOS os parágrafos e quebras de linha
+   - Preserve marcadores de tempo (ex: "0:00-2:30")
+   - Mantenha títulos e subtítulos${this.customInstructions ? `
+
+📝 INSTRUÇÕES ESPECÍFICAS DO USUÁRIO:
+${this.customInstructions}` : ''}
+
+5. RESTRIÇÕES:
+   - NÃO adicione explicações, notas ou comentários
+   - NÃO omita ou resuma nenhuma parte
+   - Retorne APENAS o texto localizado
+   - Este texto faz parte de um documento maior
+
+TEXTO PARA LOCALIZAR:
+${chunk}
+
+LOCALIZAÇÃO PARA ${targetLang.toUpperCase()}:`;
+        } else {
+            // Prompt para Tradução Literal (padrão)
+            prompt = `Você é um tradutor profissional especializado.
 
 TAREFA: ${sourceLanguageText} traduza o texto abaixo para ${targetLang}, mantendo TOTAL FIDELIDADE ao conteúdo original.
 
@@ -620,6 +707,7 @@ TEXTO PARA TRADUZIR:
 ${chunk}
 
 TRADUÇÃO PARA ${targetLang.toUpperCase()}:`;
+        }
 
         const maxRetries = this.apiKeys.length;
         let lastError = null;

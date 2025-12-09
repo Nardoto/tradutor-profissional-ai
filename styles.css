@@ -4,23 +4,24 @@
    ======================================== */
 
 :root {
-    /* Dark Theme - Admin de Licenças */
+    /* Nardoto Design System - Dark Theme */
     --bg-primary: #0a0a0a;
     --bg-secondary: #1a1a1a;
     --bg-hover: #252525;
-    --accent-primary: #667eea;
-    --accent-secondary: #764ba2;
+    --accent-primary: #E85A2A;
+    --accent-secondary: #FF6B35;
+    --accent-dark: #D4522A;
     --success-green: #10b981;
     --success-border: #059669;
     --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --text-muted: #666666;
-    --border-color: #333333;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --border-color: rgba(255, 255, 255, 0.1);
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --radius-sm: 6px;
-    --radius-md: 10px;
+    --shadow-md: 0 8px 32px rgba(232, 90, 42, 0.2);
+    --shadow-lg: 0 20px 60px rgba(232, 90, 42, 0.3);
+    --radius-sm: 8px;
+    --radius-md: 12px;
     --radius-lg: 16px;
 }
 
@@ -98,9 +99,9 @@ body {
 }
 
 .btn-primary:hover {
-    background: #b55538;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-primary:active {
@@ -149,8 +150,122 @@ body {
 }
 
 .btn-success:hover {
-    background: #97c9a9;
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   BOTÃO TRADUZIR - DESTAQUE PRINCIPAL (Estilo Nardoto)
+   ======================================== */
+
+.btn-translate-main {
+    background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 50%, #E85A2A 100%);
+    background-size: 200% 200%;
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(232, 90, 42, 0.4);
+    position: relative;
+    overflow: hidden;
+    animation: pulseGlow 2s infinite;
+}
+
+.btn-translate-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 8px 32px rgba(232, 90, 42, 0.4);
+    }
+    50% {
+        box-shadow: 0 12px 40px rgba(232, 90, 42, 0.6);
+    }
+}
+
+.btn-translate-main:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 50px rgba(232, 90, 42, 0.6);
+    background-position: 100% 0;
+}
+
+.btn-translate-main:active {
+    transform: translateY(-2px);
+}
+
+.btn-translate-main:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    animation: none;
+}
+
+.btn-translate-main:disabled::before {
+    animation: none;
+}
+
+/* ========================================
+   BOTÕES GHOST - DISCRETOS (API, Limpar, Help)
+   ======================================== */
+
+.btn-ghost {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.65rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+    min-width: 42px;
+    height: 42px;
+}
+
+.btn-ghost:hover {
+    background: rgba(232, 90, 42, 0.08);
+    border-color: rgba(232, 90, 42, 0.25);
+    color: #E85A2A;
     transform: translateY(-1px);
+}
+
+.btn-ghost:active {
+    transform: scale(0.97) translateY(0);
+}
+
+.btn-ghost svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.75;
+}
+
+/* Botão ghost com texto */
+.btn-ghost.with-text {
+    padding: 0.65rem 1rem;
+    min-width: auto;
 }
 
 .header-actions {
@@ -159,23 +274,49 @@ body {
     align-items: center;
 }
 
+/* ========================================
+   DROPDOWNS ELEGANTES
+   ======================================== */
+
 .root-folder-dropdown {
-    padding: 0.6rem 1rem;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+    padding-right: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--text-primary);
-    background: var(--bg-primary);
+    background: linear-gradient(180deg, #1f1f1f 0%, #171717 100%);
     cursor: pointer;
-    transition: border-color 0.2s ease;
-    min-width: 200px;
+    transition: all 0.25s ease;
+    min-width: 180px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.root-folder-dropdown:hover {
+    border-color: rgba(232, 90, 42, 0.4);
+    background: linear-gradient(180deg, #252525 0%, #1a1a1a 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .root-folder-dropdown:focus {
     outline: none;
     border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(232, 90, 42, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.root-folder-dropdown option {
+    background: #1a1a1a;
+    color: var(--text-primary);
+    padding: 0.75rem;
+    font-weight: 500;
 }
 
 .btn-icon {
@@ -510,9 +651,9 @@ body {
 }
 
 .btn-copy-large:hover {
-    background: #b55538;
+    background: var(--accent-dark);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-save-text {
@@ -531,7 +672,7 @@ body {
 }
 
 .btn-save-text:hover {
-    background: #97c9a9;
+    background: var(--accent-dark);
     transform: translateY(-2px);
 }
 
@@ -780,7 +921,7 @@ textarea:focus {
 }
 
 .btn-save-youtube:hover {
-    background: #b55538;
+    background: var(--accent-dark);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
@@ -1013,7 +1154,7 @@ textarea:focus {
 }
 
 .btn-ai-detect {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
     color: white;
     border: none;
     padding: 0.4rem 0.6rem;
@@ -1029,7 +1170,7 @@ textarea:focus {
 .btn-ai-detect:hover {
     opacity: 1;
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(232, 90, 42, 0.4);
 }
 
 .btn-ai-detect svg {

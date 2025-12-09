@@ -1,13 +1,13 @@
 // ========================================
 // SISTEMA DE AUTENTICAÇÃO FIREBASE
 // Firebase Authentication Manager
-// Version: 3.7.0 - Popup with Redirect Fallback
+// Version: 3.8.0 - Dark Theme + Fixed Login Screen
 // Desenvolvido por: Nardoto
 // ========================================
 
 class AuthManager {
     constructor() {
-        console.log('🔐 AuthManager v3.7.0 - Popup with Redirect Fallback - by Nardoto');
+        console.log('🔐 AuthManager v3.8.0 - Dark Theme + Fixed Login Screen - by Nardoto');
 
         this.currentUser = null;
         this.userStats = {
