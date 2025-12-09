@@ -401,27 +401,35 @@ class AuthManager {
             return false;
         }
 
-        if (this.userStats.isPro) {
-            return true;
-        }
-
-        if (this.userStats.translationsToday >= this.userStats.translationsLimit) {
-            this.showLimitReachedModal();
-            return false;
-        }
-
+        // Sem limite de traduções - usuário pode traduzir à vontade
         return true;
     }
 
     updateUserStatsUI() {
-        // Atualizar barra de progresso
-        const usageBar = document.getElementById('usageBar');
-        const usedEl = document.getElementById('translationsUsed');
+        // Atualizar estatísticas de uso das APIs
+        const statsContainer = document.getElementById('apiUsageStats');
+        if (!statsContainer) return;
 
-        if (usageBar && usedEl) {
-            const percentage = (this.userStats.translationsToday / this.userStats.translationsLimit) * 100;
-            usageBar.style.width = Math.min(percentage, 100) + '%';
-            usedEl.textContent = this.userStats.translationsToday;
+        // Buscar dados de uso do translator (se disponível)
+        if (window.translator && window.translator.apiKeys && window.translator.apiKeys.length > 0) {
+            const apiKeys = window.translator.apiKeys;
+            let html = '';
+
+            apiKeys.forEach((api, index) => {
+                const chars = api.charsUsed || 0;
+                const charsFormatted = chars.toLocaleString('pt-BR');
+                const limit = '1.5M'; // Limite aproximado gratuito do Google Gemini
+                const isActive = index === window.translator.currentKeyIndex;
+                const activeStyle = isActive ? 'color: #10b981; font-weight: 600;' : '';
+
+                html += `<div style="margin-bottom: 0.3rem; ${activeStyle}">
+                    ${isActive ? '▶ ' : ''}${api.name}: <span style="color: #E85A2A;">${charsFormatted}</span> chars
+                </div>`;
+            });
+
+            statsContainer.innerHTML = html;
+        } else {
+            statsContainer.innerHTML = '<div style="color: #666;">Nenhuma API configurada</div>';
         }
     }
 
@@ -438,7 +446,7 @@ class AuthManager {
 
             if (avatar) avatar.src = this.currentUser.photoURL || '';
             if (name) name.textContent = this.currentUser.displayName || this.currentUser.email;
-            if (plan) plan.textContent = this.userStats.isPro ? 'Plano PRO' : 'Plano Grátis';
+            if (plan) plan.textContent = 'API Própria';
         }
     }
 

@@ -207,24 +207,13 @@
         <!-- Menu Dropdown do Usuário -->
         <div id="userDropdownMenu" style="display: none; position: absolute; top: 5rem; right: 2rem; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 260px; z-index: 1000;">
             <div style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <div style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; font-size: 0.9rem;">Uso de Hoje</div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <div style="flex: 1; height: 6px; background: #252525; border-radius: 10px; overflow: hidden;">
-                        <div id="usageBar" style="height: 100%; background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%); width: 0%; transition: width 0.3s;"></div>
-                    </div>
-                </div>
-                <div style="font-size: 0.8rem; color: #9CA3AF;">
-                    <span id="translationsUsed" style="font-weight: 600; color: #E85A2A;">0</span> / 50 traduções
+                <div style="font-weight: 600; color: #fff; margin-bottom: 0.5rem; font-size: 0.9rem;">Uso de API</div>
+                <div id="apiUsageStats" style="font-size: 0.75rem; color: #9CA3AF; max-height: 80px; overflow-y: auto;">
+                    <div style="color: #666;">Nenhuma API configurada</div>
                 </div>
             </div>
 
             <div style="padding: 0.75rem;">
-                <button id="freeTrialButton" class="btn-success" style="width: 100%; margin-bottom: 0.5rem; justify-content: center; display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.85rem; padding: 0.6rem;">
-                    🎁 Testar Grátis 3 Dias
-                </button>
-                <button id="upgradeButton" class="btn-primary" style="width: 100%; margin-bottom: 0.5rem; justify-content: center; background: linear-gradient(135deg, #E85A2A 0%, #FF6B35 100%); font-size: 0.85rem; padding: 0.6rem;">
-                    ⭐ Upgrade para PRO
-                </button>
                 <button id="logoutButton" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
                     🚪 Sair
                 </button>
@@ -735,13 +724,13 @@
 
             <div style="background: linear-gradient(135deg, rgba(232, 90, 42, 0.15) 0%, rgba(255, 107, 53, 0.05) 100%); padding: 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; border: 1px solid rgba(232, 90, 42, 0.3);">
                 <h3 style="color: #E85A2A; margin: 0 0 0.75rem 0; font-size: 0.95rem; text-align: center;">
-                    ✨ Plano GRATUITO Inclui:
+                    ✨ 100% GRATUITO com sua API:
                 </h3>
                 <ul style="margin: 0; padding-left: 1.25rem; color: #9CA3AF; font-size: 0.85rem; line-height: 1.7;">
-                    <li><strong style="color: #fff;">50 traduções por dia</strong> com IA Google Gemini</li>
+                    <li><strong style="color: #fff;">Traduções ilimitadas</strong> com IA Google Gemini</li>
+                    <li><strong style="color: #fff;">Use sua API Key</strong> gratuita do Google</li>
                     <li><strong style="color: #fff;">Exportar TXT e SRT</strong> (legendas para vídeos)</li>
                     <li><strong style="color: #fff;">Auto-detectar idiomas</strong> automaticamente</li>
-                    <li><strong style="color: #fff;">Traduções profissionais</strong> ilimitadas em caracteres</li>
                 </ul>
             </div>
 

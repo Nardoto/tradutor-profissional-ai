@@ -210,7 +210,8 @@ class ProfessionalTranslator {
         this.apiKeys.push({
             key: trimmedKey,
             name: trimmedName,
-            active: true
+            active: true,
+            charsUsed: 0
         });
 
         this.saveApiKeys();
@@ -240,6 +241,29 @@ class ProfessionalTranslator {
         this.currentKeyIndex = (this.currentKeyIndex + 1) % this.apiKeys.length;
         console.log(`🔄 Rotacionando para: ${this.getCurrentKeyName()}`);
         return true;
+    }
+
+    /**
+     * Rastreia caracteres usados pela API Key atual
+     */
+    trackCharacterUsage(chars) {
+        if (this.apiKeys.length === 0 || this.currentKeyIndex >= this.apiKeys.length) return;
+
+        // Incrementar contador de caracteres
+        if (!this.apiKeys[this.currentKeyIndex].charsUsed) {
+            this.apiKeys[this.currentKeyIndex].charsUsed = 0;
+        }
+        this.apiKeys[this.currentKeyIndex].charsUsed += chars;
+
+        // Salvar no localStorage
+        this.saveApiKeys();
+
+        // Atualizar UI de estatísticas (se authManager disponível)
+        if (window.authManager) {
+            window.authManager.updateUserStatsUI();
+        }
+
+        console.log(`📊 ${this.getCurrentKeyName()}: +${chars.toLocaleString()} chars (Total: ${this.apiKeys[this.currentKeyIndex].charsUsed.toLocaleString()})`);
     }
 
     updateOriginalLabel(langValue) {
@@ -761,6 +785,9 @@ TRADUÇÃO PARA ${targetLang.toUpperCase()}:`;
                     throw new Error('Resposta vazia da IA');
                 }
 
+                // 📊 Rastrear caracteres usados nesta API Key
+                this.trackCharacterUsage(chunk.length);
+
                 return translatedText;
 
             } catch (error) {
@@ -1136,4 +1163,5 @@ Tradução:
 let translator;
 document.addEventListener('DOMContentLoaded', () => {
     translator = new ProfessionalTranslator();
+    window.translator = translator; // Expor para authManager acessar stats
 });
